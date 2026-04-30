@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+<meta name="googlebot" content="noindex,nofollow,noarchive,nosnippet">
+<title>ピクサーの世界展 家族旅行しおり ☁ To Toyosu and Beyond!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Luckiest+Guy&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* トイストーリー カラー */
+    --woody-red: #C8102E;
+    --woody-yellow: #FFC72C;
+    --woody-brown: #6B3410;
+    --woody-tan: #E8B86E;
+    --buzz-green: #1B7F3A;
+    --buzz-purple: #5B2D8C;
+    --buzz-white: #F4F4F0;
+    --andy-sky: #5BB4E8;
+    --andy-sky-deep: #2E7FB8;
+    --andy-cloud: #FFFFFF;
+    --paper: #FFF8E7;
+    --ink: #2A1810;
+    --shadow: rgba(42, 24, 16, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--ink);
+    background: var(--andy-sky);
+    background-image:
+      radial-gradient(ellipse 100px 50px at 12% 10%, var(--andy-cloud) 0%, transparent 70%),
+      radial-gradient(ellipse 140px 60px at 88% 22%, var(--andy-cloud) 0%, transparent 70%),
+      radial-gradient(ellipse 110px 55px at 25% 45%, var(--andy-cloud) 0%, transparent 70%),
+      radial-gradient(ellipse 130px 60px at 70% 65%, var(--andy-cloud) 0%, transparent 70%),
+      radial-gradient(ellipse 90px 45px at 8% 78%, var(--andy-cloud) 0%, transparent 70%),
+      radial-gradient(ellipse 120px 55px at 95% 88%, var(--andy-cloud) 0%, transparent 70%),
+      linear-gradient(180deg, var(--andy-sky) 0%, var(--andy-sky-deep) 100%);
+    background-attachment: fixed;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* === 背景の浮遊雲レイヤー === */
+  .floating-clouds {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .cloud {
+    position: absolute;
+    background: var(--andy-cloud);
+    border-radius: 100px;
+    opacity: 0.7;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+    animation: drift 25s linear infinite;
+  }
+  .cloud::before, .cloud::after {
+    content: '';
+    position: absolute;
+    background: var(--andy-cloud);
+    border-radius: 50%;
+  }
+  .cloud-1 { width: 100px; height: 32px; top: 8%; left: -10%; animation-duration: 60s; }
+  .cloud-1::before { width: 50px; height: 50px; top: -20px; left: 12px; }
+  .cloud-1::after { width: 40px; height: 40px; top: -14px; right: 20px; }
+  .cloud-2 { width: 130px; height: 38px; top: 35%; left: -15%; animation-duration: 80s; animation-delay: -20s; opacity: 0.6; }
+  .cloud-2::before { width: 60px; height: 60px; top: -24px; left: 18px; }
+  .cloud-2::after { width: 50px; height: 50px; top: -18px; right: 22px; }
+  .cloud-3 { width: 90px; height: 28px; top: 70%; left: -8%; animation-duration: 50s; animation-delay: -30s; opacity: 0.5; }
+  .cloud-3::before { width: 45px; height: 45px; top: -18px; left: 10px; }
+  .cloud-3::after { width: 35px; height: 35px; top: -12px; right: 18px; }
+  @keyframes drift {
+    from { transform: translateX(0); }
+    to { transform: translateX(120vw); }
+  }
+
+  /* === キラキラ星 === */
+  .twinkle-star {
+    position: absolute;
+    width: 14px; height: 14px;
+    background: var(--woody-yellow);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    animation: twinkle 2.4s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.4; transform: scale(0.8) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+  }
+
+  /* z-indexの調整 */
+  .hero, .container, .footer { position: relative; z-index: 2; }
+
+  /* === キャラクターアニメーション === */
+
+  /* === 3Dキャラクターラッパー === */
+  .char3d {
+    position: relative;
+    perspective: 1200px;
+    pointer-events: auto;
+    z-index: 3;
+  }
+  .char3d-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    animation: char3DSpin 6s ease-in-out infinite;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .char3d:hover .char3d-inner {
+    transform: scale(1.25) translateZ(40px) rotateY(0deg) !important;
+    animation-play-state: paused;
+  }
+  .char3d-inner img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    filter: drop-shadow(3px 6px 10px rgba(0,0,0,0.45));
+  }
+  .char3d-inner .char-back {
+    transform: rotateY(180deg);
+  }
+  @keyframes char3DSpin {
+    0%, 100% { transform: rotateY(0deg); }
+    45% { transform: rotateY(0deg); }
+    55% { transform: rotateY(180deg); }
+    95% { transform: rotateY(180deg); }
+  }
+  @keyframes char3DJump {
+    0%, 100% { transform: rotateY(0deg) translateY(0); }
+    25% { transform: rotateY(0deg) translateY(-40px) rotateX(-15deg); }
+    45% { transform: rotateY(0deg) translateY(0) rotateX(0deg); }
+    55% { transform: rotateY(180deg) translateY(0) rotateX(0deg); }
+    75% { transform: rotateY(180deg) translateY(-40px) rotateX(-15deg); }
+    95% { transform: rotateY(180deg) translateY(0) rotateX(0deg); }
+  }
+  @keyframes char3DTumble {
+    0% { transform: rotateY(0deg) rotateZ(0deg) translateY(0); }
+    50% { transform: rotateY(360deg) rotateZ(180deg) translateY(-30px); }
+    100% { transform: rotateY(720deg) rotateZ(360deg) translateY(0); }
+  }
+  @keyframes char3DFlyZoom {
+    0% { transform: translateZ(-300px) rotateY(0deg) scale(0.5); opacity: 0.5; }
+    50% { transform: translateZ(0px) rotateY(180deg) scale(1); opacity: 1; }
+    100% { transform: translateZ(-300px) rotateY(360deg) scale(0.5); opacity: 0.5; }
+  }
+
+  /* ウッディがタイトルの下から登場して持ち上げる + ジャンプ */
+  .character-woody {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    width: 140px;
+    height: 220px;
+    line-height: 1;
+    font-size: 80px;
+    transform: translateX(-50%);
+    z-index: 3;
+    animation: woodyLift 6s ease-in-out infinite;
+  }
+  .character-woody .char3d-inner {
+    animation: char3DJump 4s ease-in-out infinite;
+  }
+  .character-woody.is-emoji {
+    width: auto;
+    height: auto;
+    filter: drop-shadow(3px 6px 10px rgba(0,0,0,0.5));
+  }
+  @keyframes woodyLift {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-10px); }
+  }
+  @keyframes woodyLift {
+    0%, 100% { transform: translateX(-50%) translateY(40px) rotate(-5deg); }
+    20% { transform: translateX(-50%) translateY(-20px) rotate(-5deg); }
+    40% { transform: translateX(-50%) translateY(-30px) rotate(5deg); }
+    60% { transform: translateX(-50%) translateY(-30px) rotate(-5deg); }
+    80% { transform: translateX(-50%) translateY(-20px) rotate(5deg); }
+  }
+
+  /* バズ（本物画像）が宇宙飛行 */
+  .character-buzz {
+    position: fixed;
+    top: 14%;
+    right: -180px;
+    width: 130px;
+    height: 200px;
+    font-size: 50px;
+    z-index: 5;
+    animation: buzzFly 30s linear infinite;
+    animation-delay: 8s;
+    pointer-events: auto;
+  }
+  .character-buzz .char3d-inner {
+    animation: char3DTumble 4s ease-in-out infinite;
+  }
+  .character-buzz.is-emoji {
+    width: auto;
+    height: auto;
+    filter: drop-shadow(0 6px 14px rgba(91, 45, 140, 0.6));
+  }
+  @keyframes buzzFly {
+    0% { right: -180px; top: 14%; }
+    25% { top: 8%; }
+    50% { top: 18%; }
+    75% { top: 6%; }
+    100% { right: 110vw; top: 14%; }
+  }
+
+  /* カーズが奥から手前にズームしながら走り抜ける */
+  .character-cars {
+    position: fixed;
+    bottom: 80px;
+    left: -200px;
+    width: 160px;
+    height: 220px;
+    font-size: 60px;
+    z-index: 5;
+    animation: carsRunZoom 14s ease-in-out infinite;
+    animation-delay: 4s;
+    pointer-events: auto;
+    perspective: 1500px;
+  }
+  .character-cars.is-emoji {
+    width: auto;
+    height: auto;
+    filter: drop-shadow(0 6px 14px rgba(200, 16, 46, 0.6));
+  }
+  @keyframes carsRunZoom {
+    0% { left: -200px; transform: scale(0.5); }
+    30% { transform: scale(0.8); }
+    50% { left: 50%; transform: translateX(-50%) scale(1.4); }
+    70% { transform: scale(0.8); }
+    100% { left: 110vw; transform: scale(0.5); }
+  }
+
+  /* リトル・グリーンメン（エイリアン）がポップアップ */
+  .character-aliens {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    z-index: 5;
+    pointer-events: none;
+    display: flex;
+    gap: -6px;
+    animation: alienPop 8s ease-in-out infinite;
+  }
+  .character-aliens span {
+    font-size: 36px;
+    display: inline-block;
+    filter: drop-shadow(0 3px 6px rgba(27, 127, 58, 0.6));
+  }
+  .character-aliens span:nth-child(1) { animation: alienBobA 1.6s ease-in-out infinite; }
+  .character-aliens span:nth-child(2) { animation: alienBobB 1.6s ease-in-out infinite 0.2s; }
+  .character-aliens span:nth-child(3) { animation: alienBobC 1.6s ease-in-out infinite 0.4s; }
+  @keyframes alienBobA { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  @keyframes alienBobB { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(-12px); } }
+  @keyframes alienBobC { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  @keyframes alienPop {
+    0%, 90%, 100% { transform: translateY(80px); opacity: 0; }
+    10%, 80% { transform: translateY(0); opacity: 1; }
+  }
+  .alien-speech {
+    position: absolute;
+    top: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--paper);
+    color: var(--buzz-green);
+    border: 3px solid var(--buzz-green);
+    border-radius: 16px;
+    padding: 4px 12px;
+    font-family: 'Bangers', cursive;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    white-space: nowrap;
+    box-shadow: 0 3px 0 var(--buzz-green);
+  }
+
+  /* レックス（恐竜）がページの片隅で揺れる */
+  .character-rex {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 42px;
+    z-index: 4;
+    pointer-events: none;
+    animation: rexShake 3s ease-in-out infinite;
+    filter: drop-shadow(0 4px 8px rgba(27, 127, 58, 0.5));
+    display: none; /* 必要に応じて使用 */
+  }
+  @keyframes rexShake {
+    0%, 100% { transform: translateX(-50%) rotate(-5deg); }
+    50% { transform: translateX(-50%) rotate(5deg); }
+  }
+
+  /* ハム（ピンクの貯金箱豚）がカードに座る */
+  .character-ham {
+    position: absolute;
+    top: -28px;
+    right: 16px;
+    font-size: 42px;
+    z-index: 4;
+    transform: rotate(15deg);
+    animation: hamWiggle 4s ease-in-out infinite;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+    pointer-events: none;
+  }
+  @keyframes hamWiggle {
+    0%, 100% { transform: rotate(15deg) translateY(0); }
+    50% { transform: rotate(10deg) translateY(-4px); }
+  }
+
+  /* ウッディが文字を支える */
+  .character-woody-side {
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 56px;
+    z-index: 4;
+    animation: woodyPush 4s ease-in-out infinite;
+    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.4));
+    pointer-events: none;
+  }
+  @keyframes woodyPush {
+    0%, 100% { transform: translateY(-50%) translateX(0) rotate(-5deg); }
+    50% { transform: translateY(-50%) translateX(8px) rotate(0deg); }
+  }
+
+  /* SVG保安官バッジ */
+  .sheriff-badge {
+    width: 80px;
+    height: 80px;
+    display: inline-block;
+    animation: badgeSpin 8s linear infinite;
+  }
+  @keyframes badgeSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* レスポンシブ: スマホでは一部キャラを隠す */
+  @media (max-width: 600px) {
+    .character-buzz, .character-cars { display: none; }
+    .character-aliens span { font-size: 28px; }
+  }
+
+  /* === キャラクター歓迎パレード（ピクサー展カード上） === */
+  .character-parade {
+    position: absolute;
+    top: -85px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 5;
+    pointer-events: none;
+    align-items: end;
+    font-size: 42px;
+  }
+  .character-parade .parade-char {
+    display: inline-block;
+    width: 70px;
+    height: 110px;
+    animation: paradeBob 1.6s ease-in-out infinite;
+  }
+  .character-parade .parade-char.is-emoji {
+    width: auto;
+    height: auto;
+    line-height: 1;
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35));
+  }
+  .character-parade .parade-char:nth-child(2) { animation-delay: 0.2s; }
+  .character-parade .parade-char:nth-child(3) { animation-delay: 0.4s; }
+  .character-parade .parade-char:nth-child(4) { animation-delay: 0.6s; }
+  .character-parade .parade-char:nth-child(5) { animation-delay: 0.8s; }
+
+  /* パレード内の3Dキャラ：ジャンプ＋振り返り */
+  .character-parade .parade-char .char3d-inner {
+    animation: char3DJump 3s ease-in-out infinite;
+  }
+  .character-parade .parade-char:nth-child(1) .char3d-inner { animation-delay: 0s; }
+  .character-parade .parade-char:nth-child(2) .char3d-inner { animation-delay: 0.5s; }
+  .character-parade .parade-char:nth-child(3) .char3d-inner { animation-delay: 1s; }
+  .character-parade .parade-char:nth-child(4) .char3d-inner { animation-delay: 1.5s; }
+  .character-parade .parade-char:nth-child(5) .char3d-inner { animation-delay: 2s; }
+  @keyframes paradeBob {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-10px) rotate(3deg); }
+  }
+
+  /* カード内のキャラ装飾用 */
+  .card { position: relative; }
+  .character-on-card {
+    position: absolute;
+    top: -22px;
+    right: 18px;
+    font-size: 38px;
+    z-index: 5;
+    pointer-events: none;
+    transform: rotate(15deg);
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+    animation: hamWiggle 3s ease-in-out infinite;
+  }
+
+  /* === ヘッダー === */
+  .hero {
+    position: relative;
+    padding: 60px 20px 80px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .hero::before, .hero::after {
+    content: '';
+    position: absolute;
+    width: 120px; height: 60px;
+    background: var(--andy-cloud);
+    border-radius: 50px;
+    opacity: 0.85;
+  }
+  .hero::before { top: 40px; left: 8%; box-shadow: 60px 20px 0 -10px var(--andy-cloud); }
+  .hero::after { top: 70px; right: 8%; box-shadow: -50px 25px 0 -10px var(--andy-cloud); }
+
+  .hero h1 {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: clamp(36px, 7vw, 72px);
+    color: var(--woody-yellow);
+    text-shadow:
+      4px 4px 0 var(--woody-red),
+      8px 8px 0 var(--woody-brown),
+      10px 10px 20px var(--shadow);
+    letter-spacing: 2px;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    transform: rotate(-2deg);
+    animation: bouncyTitle 4s ease-in-out infinite;
+  }
+  @keyframes bouncyTitle {
+    0%, 100% { transform: rotate(-2deg) translateY(0); }
+    50% { transform: rotate(-2deg) translateY(-6px); }
+  }
+
+  .hero .subtitle {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(18px, 3vw, 28px);
+    color: var(--buzz-white);
+    letter-spacing: 4px;
+    text-shadow: 3px 3px 0 var(--buzz-purple);
+  }
+
+  .hero .dates {
+    margin-top: 24px;
+    display: inline-block;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 14px 32px;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: clamp(14px, 2vw, 18px);
+    box-shadow: 0 8px 0 var(--woody-brown), 0 12px 24px var(--shadow);
+    border: 4px solid var(--woody-brown);
+  }
+
+  .pixar-logo {
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+  }
+  .pixar-logo img {
+    max-width: min(380px, 70vw);
+    height: auto;
+    filter: drop-shadow(0 6px 18px rgba(0,0,0,0.3));
+  }
+
+  .hero-visual {
+    margin: 28px auto 0;
+    max-width: 580px;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 6px solid var(--woody-yellow);
+    box-shadow:
+      0 0 0 4px var(--woody-brown),
+      0 12px 30px var(--shadow);
+    transform: rotate(-1deg);
+    position: relative;
+    z-index: 2;
+  }
+  .hero-visual img {
+    width: 100%;
+    display: block;
+  }
+
+  /* === コンテナ === */
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* === セクション === */
+  section { margin-bottom: 56px; }
+
+  .section-title {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: clamp(28px, 4vw, 42px);
+    color: var(--paper);
+    text-shadow: 3px 3px 0 var(--woody-brown), 6px 6px 12px var(--shadow);
+    margin-bottom: 24px;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .section-title .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px; height: 56px;
+    background: var(--woody-yellow);
+    color: var(--woody-brown);
+    border-radius: 50%;
+    border: 4px solid var(--woody-brown);
+    box-shadow: 0 4px 0 var(--woody-brown);
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  /* === カード（共通） === */
+  .card {
+    background: var(--paper);
+    border-radius: 20px;
+    box-shadow: 0 6px 0 var(--woody-brown), 0 12px 30px var(--shadow);
+    overflow: hidden;
+    margin-bottom: 24px;
+    border: 4px solid var(--woody-brown);
+    transition: transform 0.2s ease;
+  }
+
+  .card:hover { transform: translateY(-6px) rotate(-0.3deg); }
+
+  /* === キャラクター風コールアウト === */
+  .alien-callout {
+    display: inline-block;
+    background: var(--buzz-green);
+    color: var(--buzz-white);
+    border: 4px solid var(--woody-brown);
+    border-radius: 24px;
+    padding: 8px 18px;
+    font-family: 'Bangers', cursive;
+    letter-spacing: 2px;
+    font-size: 14px;
+    box-shadow: 0 4px 0 var(--woody-brown);
+    transform: rotate(-3deg);
+    margin: 8px 0;
+  }
+  .woody-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px; height: 60px;
+    background: radial-gradient(circle, var(--woody-yellow) 30%, var(--woody-red) 30% 65%, var(--woody-yellow) 65%);
+    color: var(--woody-brown);
+    border-radius: 50%;
+    border: 4px solid var(--woody-brown);
+    font-family: 'Luckiest Guy', cursive;
+    font-size: 20px;
+    box-shadow: 0 4px 0 var(--woody-brown), inset 0 0 0 4px var(--paper);
+    transform: rotate(-8deg);
+  }
+
+  /* === スタンプ風 === */
+  .toy-stamp {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--woody-red);
+    color: var(--paper);
+    font-family: 'Luckiest Guy', cursive;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    transform: rotate(8deg);
+    border: 3px dashed var(--paper);
+    box-shadow: 0 0 0 3px var(--woody-red);
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  /* === セクションタイトル下のジグザグ装飾 === */
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 6px;
+    background: repeating-linear-gradient(
+      135deg,
+      var(--woody-yellow) 0 8px,
+      var(--woody-red) 8px 16px
+    );
+    border-radius: 3px;
+    margin-left: 12px;
+    opacity: 0.85;
+  }
+
+  /* === 概要カード（航空券・ホテル等） === */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+
+  .info-card {
+    background: var(--paper);
+    border-radius: 18px;
+    padding: 24px;
+    border: 3px solid var(--woody-brown);
+    box-shadow: 0 5px 0 var(--woody-brown), 0 8px 20px var(--shadow);
+  }
+
+  .info-card h3 {
+    font-family: 'Bangers', cursive;
+    font-size: 22px;
+    color: var(--woody-red);
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+    border-bottom: 3px dashed var(--woody-tan);
+    padding-bottom: 8px;
+  }
+
+  .info-card .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dotted #d4b88e;
+    font-size: 14px;
+  }
+  .info-card .row:last-child { border-bottom: none; }
+  .info-card .row .key { color: var(--buzz-purple); font-weight: 700; }
+  .info-card .row .val { color: var(--ink); font-weight: 500; }
+
+  /* === スポットカード === */
+  .spot {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 0;
+  }
+  @media (max-width: 720px) {
+    .spot { grid-template-columns: 1fr; }
+  }
+
+  .spot-photo {
+    background: linear-gradient(135deg, var(--andy-sky) 0%, var(--buzz-purple) 100%);
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .spot-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    min-height: 220px;
+  }
+
+  .spot-photo .icon {
+    font-size: 80px;
+    filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.3));
+  }
+
+  .spot-photo .photo-label {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: var(--woody-yellow);
+    color: var(--woody-brown);
+    font-family: 'Bangers', cursive;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    border: 2px solid var(--woody-brown);
+  }
+
+  .spot-body { padding: 24px 28px; }
+
+  .spot-time {
+    display: inline-block;
+    background: var(--buzz-green);
+    color: var(--buzz-white);
+    font-family: 'Bangers', cursive;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    box-shadow: 0 3px 0 #0F5C26;
+  }
+
+  .spot-name {
+    font-family: 'Bangers', cursive;
+    font-size: 24px;
+    color: var(--woody-red);
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .spot-desc {
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 14px;
+    line-height: 1.7;
+  }
+
+  .spot-meta {
+    background: #FFEFC9;
+    border-left: 4px solid var(--woody-yellow);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--woody-brown);
+    margin-bottom: 14px;
+  }
+  .spot-meta strong { color: var(--woody-red); }
+
+  .spot-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .btn-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: transform 0.15s ease;
+    border: 2px solid;
+  }
+  .btn-link:hover { transform: translateY(-2px); }
+
+  .btn-official {
+    background: var(--woody-red);
+    color: var(--paper);
+    border-color: var(--woody-brown);
+    box-shadow: 0 3px 0 var(--woody-brown);
+  }
+  .btn-map {
+    background: var(--buzz-green);
+    color: var(--paper);
+    border-color: #0F5C26;
+    box-shadow: 0 3px 0 #0F5C26;
+  }
+  .btn-photo {
+    background: var(--andy-sky-deep);
+    color: var(--paper);
+    border-color: var(--buzz-purple);
+    box-shadow: 0 3px 0 var(--buzz-purple);
+  }
+
+  /* === Day見出し === */
+  .day-header {
+    background: var(--woody-red);
+    color: var(--paper);
+    padding: 18px 28px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    border: 4px solid var(--woody-brown);
+    box-shadow: 0 6px 0 var(--woody-brown), 0 10px 24px var(--shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .day-header h2 {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: 28px;
+    letter-spacing: 2px;
+  }
+
+  .day-header .day-tag {
+    background: var(--woody-yellow);
+    color: var(--woody-brown);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-family: 'Bangers', cursive;
+    font-size: 14px;
+    letter-spacing: 1px;
+    border: 2px solid var(--woody-brown);
+  }
+
+  /* === 注意事項・予算 === */
+  .note-list {
+    list-style: none;
+    padding: 0;
+  }
+  .note-list li {
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background: #FFEFC9;
+    border-left: 5px solid var(--woody-yellow);
+    border-radius: 8px;
+    font-size: 14px;
+    position: relative;
+    padding-left: 40px;
+  }
+  .note-list li::before {
+    content: '★';
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--woody-red);
+    font-size: 18px;
+  }
+
+  .budget-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--paper);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 3px solid var(--woody-brown);
+  }
+  .budget-table th, .budget-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px dotted #d4b88e;
+  }
+  .budget-table th {
+    background: var(--woody-red);
+    color: var(--paper);
+    font-family: 'Bangers', cursive;
+    letter-spacing: 1px;
+  }
+  .budget-table tr:last-child td { border-bottom: none; }
+  .budget-table tr.total td {
+    background: var(--woody-yellow);
+    font-weight: 900;
+    color: var(--woody-brown);
+    font-size: 16px;
+  }
+
+  /* === フッター === */
+  .footer {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--paper);
+    font-family: 'Bangers', cursive;
+    letter-spacing: 3px;
+    font-size: 18px;
+    text-shadow: 2px 2px 0 var(--woody-brown);
+  }
+
+  .andy-stamp {
+    display: inline-block;
+    background: var(--woody-brown);
+    color: var(--woody-yellow);
+    font-family: 'Luckiest Guy', cursive;
+    padding: 8px 24px;
+    border-radius: 8px;
+    transform: rotate(-8deg);
+    margin-top: 16px;
+    letter-spacing: 4px;
+    font-size: 14px;
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+
+  /* === 家族メンバー === */
+  .family {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  .member {
+    background: var(--paper);
+    padding: 8px 16px;
+    border-radius: 24px;
+    border: 3px solid var(--woody-brown);
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 3px 0 var(--woody-brown);
+  }
+  .member .emoji { margin-right: 6px; }
+
+  /* === プランタイトル（A/B切替用） === */
+  .plan-title {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: clamp(22px, 3.5vw, 32px);
+    color: var(--paper);
+    text-shadow: 3px 3px 0 var(--woody-brown), 5px 5px 10px var(--shadow);
+    margin: 24px 0 12px;
+    letter-spacing: 1.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .plan-title .plan-letter {
+    background: var(--woody-yellow);
+    color: var(--woody-brown);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 4px solid var(--woody-brown);
+    box-shadow: 0 4px 0 var(--woody-brown);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+  .plan-title .plan-letter.b { background: var(--buzz-green); color: var(--buzz-white); border-color: #0F5C26; box-shadow: 0 4px 0 #0F5C26; }
+  .plan-desc {
+    background: var(--paper);
+    border-radius: 12px;
+    padding: 12px 18px;
+    margin-bottom: 16px;
+    border: 3px solid var(--woody-brown);
+    font-size: 14px;
+    box-shadow: 0 4px 0 var(--woody-brown);
+  }
+
+  /* === 移動手段カード（カラー差別化） === */
+  .info-card.recommended {
+    border-color: var(--woody-red);
+    box-shadow: 0 5px 0 var(--woody-red), 0 8px 20px var(--shadow);
+    background: linear-gradient(180deg, #FFF8E7 0%, #FFEAD3 100%);
+    position: relative;
+  }
+  .info-card.recommended::before {
+    content: '★ BEST ★';
+    position: absolute;
+    top: -14px;
+    right: 16px;
+    background: var(--woody-red);
+    color: var(--paper);
+    font-family: 'Bangers', cursive;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    border: 2px solid var(--woody-brown);
+  }
+  .info-card .lead {
+    font-size: 13px;
+    color: var(--woody-brown);
+    margin-bottom: 10px;
+    line-height: 1.6;
+  }
+
+  /* === プラン間セパレーター === */
+  .plan-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 60px 0 40px;
+    gap: 16px;
+  }
+  .plan-separator::before,
+  .plan-separator::after {
+    content: '';
+    flex: 1;
+    height: 4px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--woody-yellow) 0 12px,
+      transparent 12px 20px
+    );
+    border-radius: 2px;
+  }
+  .plan-separator-text {
+    font-family: 'Luckiest Guy', cursive;
+    color: var(--paper);
+    text-shadow: 2px 2px 0 var(--woody-brown);
+    letter-spacing: 3px;
+    font-size: clamp(16px, 2.5vw, 22px);
+    background: var(--woody-red);
+    padding: 8px 24px;
+    border-radius: 30px;
+    border: 4px solid var(--woody-brown);
+    box-shadow: 0 4px 0 var(--woody-brown), 0 8px 18px var(--shadow);
+    transform: rotate(-2deg);
+    white-space: nowrap;
+  }
+
+  /* === 音楽プレーヤー === */
+  #music-player {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+    text-align: right;
+  }
+  #music-toggle {
+    background: var(--woody-yellow);
+    color: var(--woody-brown);
+    border: 4px solid var(--woody-brown);
+    font-family: 'Bangers', cursive;
+    letter-spacing: 1.5px;
+    padding: 12px 22px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 5px 0 var(--woody-brown), 0 8px 16px rgba(0,0,0,0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  #music-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 0 var(--woody-brown), 0 10px 20px rgba(0,0,0,0.4);
+  }
+  #music-toggle:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 var(--woody-brown);
+  }
+  #music-toggle.playing {
+    background: var(--buzz-green);
+    color: var(--buzz-white);
+    border-color: #0F5C26;
+    box-shadow: 0 5px 0 #0F5C26, 0 8px 16px rgba(0,0,0,0.35);
+    animation: musicPulse 1.5s ease-in-out infinite;
+  }
+  @keyframes musicPulse {
+    0%, 100% { box-shadow: 0 5px 0 #0F5C26, 0 8px 16px rgba(0,0,0,0.35); }
+    50% { box-shadow: 0 5px 0 #0F5C26, 0 8px 24px rgba(27, 127, 58, 0.7); }
+  }
+  #player-container {
+    margin-top: 10px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 4px solid var(--woody-brown);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    background: #000;
+  }
+  #yt-player { display: block; }
+
+  /* === ウェルカムオーバーレイ === */
+  #welcome-overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(46, 127, 184, 0.95) 0%, rgba(91, 45, 140, 0.95) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.5s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes fadeOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.95); }
+  }
+  #welcome-overlay.closing {
+    animation: fadeOut 0.4s ease forwards;
+    pointer-events: none;
+  }
+  .welcome-card {
+    background: var(--paper);
+    border-radius: 28px;
+    padding: 44px 32px 36px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    border: 6px solid var(--woody-brown);
+    box-shadow: 0 12px 0 var(--woody-brown), 0 24px 50px rgba(0,0,0,0.5);
+    position: relative;
+    transform: rotate(-2deg);
+  }
+  .welcome-card::before {
+    content: '★';
+    position: absolute;
+    top: -28px; left: 50%;
+    transform: translateX(-50%) rotate(2deg);
+    background: var(--woody-yellow);
+    color: var(--woody-brown);
+    font-size: 28px;
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    border: 5px solid var(--woody-brown);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Luckiest Guy', cursive;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .welcome-title {
+    font-family: 'Luckiest Guy', cursive;
+    color: var(--woody-red);
+    font-size: clamp(24px, 5vw, 32px);
+    text-shadow: 3px 3px 0 var(--woody-yellow);
+    margin: 12px 0 16px;
+    letter-spacing: 2px;
+    line-height: 1.2;
+  }
+  .welcome-sub {
+    font-family: 'Bangers', cursive;
+    font-size: 18px;
+    color: var(--woody-brown);
+    margin-bottom: 28px;
+    letter-spacing: 1px;
+    line-height: 1.4;
+  }
+  #welcome-start {
+    background: var(--woody-yellow);
+    color: var(--woody-brown);
+    border: 4px solid var(--woody-brown);
+    font-family: 'Bangers', cursive;
+    letter-spacing: 1.5px;
+    padding: 14px 28px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-bottom: 12px;
+    display: block;
+    width: 100%;
+    box-shadow: 0 6px 0 var(--woody-brown);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  #welcome-start:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 0 var(--woody-brown);
+  }
+  #welcome-start:active {
+    transform: translateY(3px);
+    box-shadow: 0 3px 0 var(--woody-brown);
+  }
+  #welcome-skip {
+    background: transparent;
+    color: var(--woody-brown);
+    border: 3px dashed var(--woody-brown);
+    font-family: 'Bangers', cursive;
+    padding: 8px 20px;
+    border-radius: 24px;
+    cursor: pointer;
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+  .welcome-note {
+    font-size: 11px;
+    color: var(--woody-brown);
+    margin-top: 18px;
+    opacity: 0.75;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+
+<!-- 浮遊する雲 -->
+<div class="floating-clouds" aria-hidden="true">
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+</div>
+
+<!-- バズ・ライトイヤー（本物）が宇宙でクルクル回転しながら飛ぶ -->
+<div class="character-buzz char3d" aria-hidden="true">
+  <div class="char3d-inner">
+    <img class="char-front" src="https://static.wikia.nocookie.net/pixar/images/5/55/Buzz_Lightyear_ts4.png.png/revision/latest" alt="Buzz Lightyear" referrerpolicy="no-referrer" onerror="this.parentElement.parentElement.outerHTML='<div class=&quot;character-buzz is-emoji&quot; aria-hidden=&quot;true&quot;>🚀</div>';">
+    <img class="char-back" src="https://static.wikia.nocookie.net/pixar/images/5/55/Buzz_Lightyear_ts4.png.png/revision/latest" alt="Buzz Lightyear" referrerpolicy="no-referrer">
+  </div>
+</div>
+
+<!-- カーズが走る・3D振り返り -->
+<div class="character-cars char3d" aria-hidden="true">
+  <div class="char3d-inner">
+    <img class="char-front" src="https://cdn.mundopixar.com/characters-images/cars-front.webp" alt="Lightning McQueen" referrerpolicy="no-referrer" onerror="this.parentElement.parentElement.outerHTML='<div class=&quot;character-cars is-emoji&quot; aria-hidden=&quot;true&quot;>🏎️</div>';">
+    <img class="char-back" src="https://cdn.mundopixar.com/characters-images/cars-back.webp" alt="Cars Back" referrerpolicy="no-referrer">
+  </div>
+</div>
+
+<!-- リトル・グリーンメン（エイリアン）がポップアップ -->
+<div class="character-aliens" aria-hidden="true">
+  <div class="alien-speech">OOOOH!</div>
+  <span>👽</span>
+  <span>👽</span>
+  <span>👽</span>
+</div>
+
+<!-- ウェルカムオーバーレイ（自動再生スタート） -->
+<div id="welcome-overlay">
+  <div class="welcome-card">
+    <div class="welcome-cloud-deco"></div>
+    <h2 class="welcome-title">★ Welcome, Partner! ★</h2>
+    <p class="welcome-sub">ピクサーの世界展<br>家族旅行のしおり</p>
+    <button id="welcome-start" onclick="startJourney()">
+      ♪ "君はともだち" を流す
+    </button>
+    <button id="welcome-skip" onclick="startJourney(true)">
+      Skip Music
+    </button>
+    <p class="welcome-note" id="welcome-note-msg">"君はともだち" を流しながらしおりを楽しめます<br><small style="opacity:0.7;">※ローカルで開いている場合、Webサーバ経由 or GitHub Pages公開で再生されます</small></p>
+  </div>
+</div>
+
+<!-- ヒーロー -->
+<header class="hero">
+  <!-- 装飾の星 -->
+  <span class="twinkle-star" style="top: 30px; left: 8%; animation-delay: 0s;"></span>
+  <span class="twinkle-star" style="top: 60px; right: 12%; width: 18px; height: 18px; animation-delay: 0.5s;"></span>
+  <span class="twinkle-star" style="top: 100px; left: 20%; width: 10px; height: 10px; animation-delay: 1s;"></span>
+  <span class="twinkle-star" style="top: 140px; right: 22%; width: 12px; height: 12px; animation-delay: 1.5s;"></span>
+  <span class="twinkle-star" style="bottom: 100px; left: 6%; width: 14px; height: 14px; animation-delay: 0.8s;"></span>
+  <span class="twinkle-star" style="bottom: 60px; right: 8%; width: 16px; height: 16px; animation-delay: 0.3s;"></span>
+  <div class="pixar-logo">
+    <img src="https://cdn.mundopixar.com/media/logo-ja.svg" alt="ピクサーの世界展 ロゴ" onerror="this.style.display='none';">
+  </div>
+  <h1>MUNDO PIXAR<br>Family Trip!</h1>
+  <div class="subtitle">★ ピクサーの世界展 家族旅行 in 豊洲 ★</div>
+  <div class="hero-visual">
+    <img src="https://prcdn.freetls.fastly.net/release_image/11710/3966/11710-3966-3c1a278eb66ab43282bfda8535ddc112-1080x1081.jpg" alt="ピクサーの世界展 メインビジュアル" onerror="this.style.display='none';">
+  </div>
+  <div class="dates">2026.07.14 (火) 〜 07.16 (木) ／ 2泊3日 ／ 家族6人</div>
+  <div class="family">
+    <span class="member"><span class="emoji">🤠</span>一貴</span>
+    <span class="member"><span class="emoji">👩</span>鈴依奈</span>
+    <span class="member"><span class="emoji">👵</span>久美</span>
+    <span class="member"><span class="emoji">👵</span>富美枝</span>
+    <span class="member"><span class="emoji">👶</span>鈴花 (1歳)</span>
+    <span class="member"><span class="emoji">👶</span>大樹 (0歳)</span>
+  </div>
+
+  <!-- ウッディがタイトルを持ち上げる・3D振り返り -->
+  <div class="character-woody char3d" aria-hidden="true">
+    <div class="char3d-inner">
+      <img class="char-front" src="https://cdn.mundopixar.com/characters-images/woody-front.webp" alt="Woody" referrerpolicy="no-referrer" onerror="this.parentElement.parentElement.outerHTML='<div class=&quot;character-woody is-emoji&quot; aria-hidden=&quot;true&quot;>🤠</div>';">
+      <img class="char-back" src="https://cdn.mundopixar.com/characters-images/woody-back.webp" alt="Woody Back" referrerpolicy="no-referrer">
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- 概要 -->
+  <section>
+    <h2 class="section-title"><span class="badge">★</span>旅のテーマ</h2>
+    <div class="card" style="padding: 24px 28px;">
+      <p style="font-size: 16px; line-height: 1.9;">
+        <strong style="color: var(--woody-red); font-family: 'Bangers', cursive; font-size: 20px; letter-spacing: 1px;">「豊洲グルメ＆アート満喫 メリハリ旅」</strong><br>
+        ピクサー展・チームラボ・千客万来・豊洲市場・ホテルが<strong>すべて徒歩圏内</strong>。観光は豊洲エリアに集中させ、グルメとアート体験を満喫。あとはホテルでゆっくり、メリハリのある最高の3日間。
+      </p>
+    </div>
+  </section>
+
+  <!-- 航空券・ホテル概要 -->
+  <section>
+    <h2 class="section-title"><span class="badge">✈</span>移動・宿泊</h2>
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>✈ 往路 7/14 (火)</h3>
+        <div class="row"><span class="key">便名</span><span class="val">ANA246 ★推奨</span></div>
+        <div class="row"><span class="key">福岡 発</span><span class="val">10:15</span></div>
+        <div class="row"><span class="key">羽田 着</span><span class="val">11:55</span></div>
+        <div class="row"><span class="key">マイル</span><span class="val">8,500 × 4名</span></div>
+      </div>
+      <div class="info-card">
+        <h3>✈ 復路 7/16 (木)</h3>
+        <div class="row"><span class="key">便名</span><span class="val">ANA257 ★推奨</span></div>
+        <div class="row"><span class="key">羽田 発</span><span class="val">15:25</span></div>
+        <div class="row"><span class="key">福岡 着</span><span class="val">17:30頃</span></div>
+        <div class="row"><span class="key">合計マイル</span><span class="val">68,000</span></div>
+      </div>
+      <div class="info-card">
+        <h3>🚌 空港 ⇄ ホテル</h3>
+        <div class="row"><span class="key">推奨</span><span class="val">リムジンバス直行</span></div>
+        <div class="row"><span class="key">所要</span><span class="val">20〜30分</span></div>
+        <div class="row"><span class="key">料金</span><span class="val">1,000円/人</span></div>
+        <div class="row"><span class="key">乗場</span><span class="val">豊洲駅 2番出口前</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 移動手段 まるごとガイド -->
+  <section>
+    <h2 class="section-title"><span class="badge">🚌</span>移動手段 まるごとガイド</h2>
+    <div class="info-grid">
+
+      <div class="info-card recommended">
+        <h3>🚌 リムジンバス</h3>
+        <div class="lead">羽田 ⇄ 豊洲駅 直行・途中停車なし。荷物多くても楽。</div>
+        <div class="row"><span class="key">所要</span><span class="val">20〜30分</span></div>
+        <div class="row"><span class="key">料金</span><span class="val">1,000円/人</span></div>
+        <div class="row"><span class="key">6名合計</span><span class="val">6,000円</span></div>
+        <div class="row"><span class="key">乗場</span><span class="val">豊洲駅2番出口前</span></div>
+        <div style="margin-top:10px;"><a class="btn-link btn-official" href="https://www.limousinebus.co.jp/ja/busstop/detail/ToyosuStation/" target="_blank" rel="noopener">▶ 時刻表</a></div>
+      </div>
+
+      <div class="info-card">
+        <h3>🚕 GO PREMIUM タクシー</h3>
+        <div class="lead">6人乗りワゴンでドアtoドア。雨・荷物多い時の保険。</div>
+        <div class="row"><span class="key">羽田⇄豊洲</span><span class="val">約7,000〜10,000円</span></div>
+        <div class="row"><span class="key">所要</span><span class="val">約30分</span></div>
+        <div class="row"><span class="key">アプリ</span><span class="val">事前インストール</span></div>
+      </div>
+
+      <div class="info-card">
+        <h3>🚝 ゆりかもめ</h3>
+        <div class="lead">無人運転・高架で景色◎。子供が喜ぶ。お台場行く時に最適。</div>
+        <div class="row"><span class="key">豊洲⇄台場</span><span class="val">8分・340円</span></div>
+        <div class="row"><span class="key">豊洲⇄新橋</span><span class="val">22分・390円</span></div>
+        <div class="row"><span class="key">バリアフリー</span><span class="val">エレベーター完備</span></div>
+      </div>
+
+      <div class="info-card">
+        <h3>👟 徒歩</h3>
+        <div class="lead">豊洲エリア内（ホテル⇄ピクサー展⇄千客万来）はすべて徒歩圏。</div>
+        <div class="row"><span class="key">ホテル⇄ピクサー展</span><span class="val">5〜8分</span></div>
+        <div class="row"><span class="key">ホテル⇄千客万来</span><span class="val">3〜5分</span></div>
+        <div class="row"><span class="key">ホテル⇄チームラボ</span><span class="val">8〜10分</span></div>
+      </div>
+
+      <div class="info-card">
+        <h3>🚆 電車（メトロ）</h3>
+        <div class="lead">有楽町線・豊洲駅。階段多い駅もあるのでベビーカー注意。</div>
+        <div class="row"><span class="key">豊洲⇄銀座</span><span class="val">8分・210円</span></div>
+        <div class="row"><span class="key">豊洲⇄東京</span><span class="val">11分・210円</span></div>
+        <div class="row"><span class="key">注意</span><span class="val">乗換多めで赤ちゃん向きでない</span></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ホテル -->
+  <section>
+    <h2 class="section-title"><span class="badge">🏨</span>ホテル ／ 第1候補</h2>
+    <div class="card spot">
+      <!-- ハム（貯金箱豚）が可愛く座る -->
+      <div class="character-on-card" aria-hidden="true">🐷</div>
+      <div class="spot-photo">
+        <img src="https://img.dormy-hotels.com/resort/hotels/la_tokyobay/files/images/home/img_hotspring01.jpg" alt="ラビスタ東京ベイ 大浴場" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=icon>🏨</div>';">
+        <span class="photo-label">★ HOTEL ★</span>
+      </div>
+      <div class="spot-body">
+        <div class="spot-time">2泊・2室・ベビーベッド×2</div>
+        <h3 class="spot-name">ラビスタ東京ベイ</h3>
+        <p class="spot-desc">
+          ピクサー展・千客万来・チームラボすべて徒歩圏内！最上階14階に天然温泉の眺望大浴場。豊洲市場のお膝元にふさわしい朝食ビュッフェが大評判。共立リゾート系列の名物「夜鳴きそば」（無料）も楽しめる。
+        </p>
+        <div class="spot-meta">
+          <strong>料金目安</strong>: 2室×2泊 約6〜10万円　／　<strong>申込メモ</strong>: ベビーベッド×2 事前予約必須
+        </div>
+        <div class="spot-links">
+          <a class="btn-link btn-official" href="https://dormy-hotels.com/resort/hotels/la_tokyobay/" target="_blank" rel="noopener">▶ 公式サイト</a>
+          <a class="btn-link btn-map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%A9%E3%83%93%E3%82%B9%E3%82%BF%E6%9D%B1%E4%BA%AC%E3%83%99%E3%82%A4" target="_blank" rel="noopener">📍 Googleマップ</a>
+          <a class="btn-link btn-photo" href="https://www.google.com/search?q=%E3%83%A9%E3%83%93%E3%82%B9%E3%82%BF%E6%9D%B1%E4%BA%AC%E3%83%99%E3%82%A4&tbm=isch" target="_blank" rel="noopener">📷 写真を見る</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Day1 ===== -->
+  <section>
+    <div class="day-header">
+      <h2>★ Day 1 ／ 7月14日 (火)</h2>
+      <span class="day-tag">到着 → チームラボ → 千客万来</span>
+    </div>
+
+    <!-- チームラボ -->
+    <div class="card spot">
+      <div class="spot-photo" style="background: linear-gradient(135deg, #00D4FF 0%, #5B2D8C 100%);">
+        <img src="https://assets.team-lab.com/b5EBo9Uo-OK6SM09ZTkEZQ/d2qbUgpWw3VyzUFKbriq75/public" alt="チームラボプラネッツ Floating in the Falling Universe of Flowers" onerror="this.onerror=null; this.src='https://prtimes.jp/i/37065/23/resize/d37065-23-7b59a20905dc07b0b5bd-0.jpg';">
+        <div class="fallback" style="display:none; align-items:center; justify-content:center; width:100%; height:100%;"><div class="icon">🌊</div></div>
+        <span class="photo-label">★ IMMERSIVE ART ★</span>
+      </div>
+      <div class="spot-body">
+        <div class="spot-time">13:30 〜 15:00</div>
+        <h3 class="spot-name">チームラボプラネッツ TOKYO DMM</h3>
+        <p class="spot-desc">
+          水と光の没入型デジタルアート。SNS映え抜群の幻想空間。広い水盤を裸足で歩く体験は子どもにも一生モノの記憶に。
+        </p>
+        <div class="spot-meta">
+          ⚠ <strong>抱っこ紐2つ必須</strong>（ベビーカー不可）／ 水エリアあり、<strong>着替え持参推奨</strong>
+        </div>
+        <div class="spot-links">
+          <a class="btn-link btn-official" href="https://www.teamlab.art/jp/e/planets/" target="_blank" rel="noopener">▶ 公式サイト</a>
+          <a class="btn-link btn-map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%81%E3%83%BC%E3%83%A0%E3%83%A9%E3%83%9C%E3%83%97%E3%83%A9%E3%83%8D%E3%83%83%E3%83%84+TOKYO+DMM" target="_blank" rel="noopener">📍 Googleマップ</a>
+          <a class="btn-link btn-photo" href="https://www.google.com/search?q=teamlab+planets+tokyo&tbm=isch" target="_blank" rel="noopener">📷 写真を見る</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 千客万来（夕食） -->
+    <div class="card spot">
+      <div class="spot-photo">
+        <img src="https://yakei.jp/photo/1280/senkyakubanrai3-1280.jpg" alt="豊洲千客万来 夜景" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex';">
+        <div class="fallback" style="display:none; align-items:center; justify-content:center; width:100%; height:100%; background: linear-gradient(135deg, #C8102E 0%, #FFC72C 100%);"><div class="icon" style="font-size:80px;">🍣</div></div>
+        <span class="photo-label">★ DINNER ★</span>
+      </div>
+      <div class="spot-body">
+        <div class="spot-time">17:30 〜 19:00</div>
+        <h3 class="spot-name">豊洲 千客万来 ／ 江戸前場下町</h3>
+        <p class="spot-desc">
+          江戸の街並みを再現した豊洲市場隣接の食楽施設。寿司・海鮮丼・食べ歩きグルメが集結。<strong>まるり鮨</strong>のマグロ寿司、<strong>相馬水産のマグロ串</strong>、<strong>越後屋助五郎の魚介串</strong>が名物。平日なので混雑控えめ。
+        </p>
+        <div class="spot-meta">
+          ⚠ 通路狭め、<strong>抱っこ紐推奨</strong>（ベビーカーは不向き）
+        </div>
+        <div class="spot-links">
+          <a class="btn-link btn-official" href="https://www.toyosu-senkyakubanrai.jp/" target="_blank" rel="noopener">▶ 公式サイト</a>
+          <a class="btn-link btn-map" href="https://www.google.com/maps/search/?api=1&query=%E8%B1%8A%E6%B4%B2%E5%8D%83%E5%AE%A2%E4%B8%87%E6%9D%A5" target="_blank" rel="noopener">📍 Googleマップ</a>
+          <a class="btn-link btn-photo" href="https://www.google.com/search?q=%E8%B1%8A%E6%B4%B2%E5%8D%83%E5%AE%A2%E4%B8%87%E6%9D%A5&tbm=isch" target="_blank" rel="noopener">📷 写真を見る</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 足湯庭園 -->
+    <div class="card spot">
+      <div class="spot-photo" style="background: linear-gradient(135deg, #1B3A5C 0%, #5B2D8C 100%);">
+        <img src="https://yakei.jp/photo/1280/senkyakubanrai5-1280.jpg" alt="千客万来 8F足湯庭園 夜景" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex';">
+        <div class="fallback" style="display:none; align-items:center; justify-content:center; width:100%; height:100%;"><div class="icon">♨</div></div>
+        <span class="photo-label">★ NIGHT VIEW ★</span>
+      </div>
+      <div class="spot-body">
+        <div class="spot-time">19:00 〜 20:00</div>
+        <h3 class="spot-name">千客万来 8F 足湯庭園</h3>
+        <p class="spot-desc">
+          豊洲の海と東京の夜景を一望しながらの足湯。<strong>無料</strong>で利用できる絶景スポット。夕暮れ〜夜景の時間帯がベスト。
+        </p>
+        <div class="spot-meta">
+          🧴 <strong>足ふきタオル持参推奨</strong>（販売もあり）
+        </div>
+        <div class="spot-links">
+          <a class="btn-link btn-official" href="https://www.toyosu-senkyakubanrai.jp/" target="_blank" rel="noopener">▶ 公式サイト</a>
+          <a class="btn-link btn-map" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E5%AE%A2%E4%B8%87%E6%9D%A5+%E8%B6%B3%E6%B9%AF%E5%BA%AD%E5%9C%92" target="_blank" rel="noopener">📍 Googleマップ</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Day2 ===== -->
+  <section>
+    <div class="day-header">
+      <h2>★ Day 2 ／ 7月15日 (水)</h2>
+      <span class="day-tag">★ メインイベント・ピクサー展 ★</span>
+    </div>
+
+    <!-- 豊洲市場 -->
+    <div class="card spot">
+      <div class="spot-photo" style="background: linear-gradient(135deg, #FFC72C 0%, #C8102E 100%);">
+        <img src="https://d1uzk9o9cg136f.cloudfront.net/f/16783489/rc/2022/12/20/27906993d07b2b492834d681c0ff2e462e6829d7_xlarge.jpg" alt="豊洲市場 大和寿司 盛り合わせ" onerror="this.onerror=null; this.src='https://d1uzk9o9cg136f.cloudfront.net/f/16783489/rc/2022/12/20/6c979930c4988491daa294ae0b95f3a653a3c4be_xlarge.jpg';">
+        <div class="fallback" style="display:none; align-items:center; justify-content:center; width:100%; height:100%;"><div class="icon">🐟</div></div>
+        <span class="photo-label">★ BRUNCH ★</span>
+      </div>
+      <div class="spot-body">
+        <div class="spot-time">10:30 〜 12:00</div>
+        <h3 class="spot-name">豊洲市場 場内飲食店街</h3>
+        <p class="spot-desc">
+          ホテルから徒歩圏。39店舗の老舗が集結する寿司ブランチの聖地。<strong>大和寿司・寿司大・大江戸（海鮮丼）</strong>などの名店が朝6時から開店。<strong>14〜15時閉店</strong>の店が多いので午前中に！
+        </p>
+        <div class="spot-meta">
+          ⚠ <strong>2026/7/15(水)の開市状況は出発前に公式PDFカレンダーで要確認</strong>（年に数回水曜休市あり、月によって変動）／ 休市時は千客万来 or ホテル朝食で代替
+        </div>
+        <div class="spot-links">
+          <a class="btn-link btn-official" href="https://www.toyosu-market.or.jp/calendar/" target="_blank" rel="noopener">▶ 休市日カレンダー</a>
+          <a class="btn-link btn-map" href="https://www.google.com/maps/search/?api=1&query=%E8%B1%8A%E6%B4%B2%E5%B8%82%E5%A0%B4" target="_blank" rel="noopener">📍 Googleマップ</a>
+          <a class="btn-link btn-photo" href="https://www.google.com/search?q=%E8%B1%8A%E6%B4%B2%E5%B8%82%E5%A0%B4+%E5%AF%BF%E5%8F%B8&tbm=isch" target="_blank" rel="noopener">📷 写真を見る</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ピクサー展 -->
+    <div class="card spot" style="border-color: var(--buzz-purple); box-shadow: 0 6px 0 var(--buzz-purple), 0 12px 30px var(--shadow); margin-top: 50px;">
+      <!-- ピクサーキャラクター歓迎パレード（3D振り返り） -->
+      <div class="character-parade" aria-hidden="true">
+        <div class="parade-char char3d"><div class="char3d-inner">
+          <img class="char-front" src="https://cdn.mundopixar.com/characters-images/woody-front.webp" alt="Woody" referrerpolicy="no-referrer" onerror="this.parentElement.parentElement.outerHTML='<span class=&quot;parade-char is-emoji&quot;>🤠</span>';">
+          <img class="char-back" src="https://cdn.mundopixar.com/characters-images/woody-back.webp" alt="" referrerpolicy="no-referrer">
+        </div></div>
+        <div class="parade-char char3d"><div class="char3d-inner">
+          <img class="char-front" src="https://cdn.mundopixar.com/characters-images/sulley-front.webp" alt="Sully" referrerpolicy="no-referrer" onerror="this.parentElement.parentElement.outerHTML='<span class=&quot;parade-char is-emoji&quot;>👹</span>';">
+          <img class="char-back" src="https://cdn.mundopixar.com/characters-images/sulley-back.webp" alt="" referrerpolicy="no-referrer">
+        </div></div>
+        <div class="parade-char char3d"><div class="char3d-inner">
+          <img class="char-front" src="https://cdn.mundopixar.com/characters-images/dori-front.webp" alt="Dory" referrerpolicy="no-referrer" onerror="this.parentElement.parentElement.outerHTML='<span class=&quot;parade-char is-emoji&quot;>🐠</span>';">
+          <img class="char-back" src="https://cdn.mundopixar.com/characters-images/dori-back.webp" alt="" referrerpolicy="no-referrer">
+        </div></div>
+        <div class="parade-char char3d"><div class="char3d-inner">
+          <img class="char-front" src="https://cdn.mundopixar.com/characters-images/joy-front.webp" alt="Joy" referrerpolicy="no-referrer" onerror="this.parentElement.parentElement.outerHTML='<span class=&quot;parade-char is-emoji&quot;>😊</span>';">
+          <img class="char-back" src="https://cdn.mundopixar.com/characters-images/joy-back.webp" alt="" referrerpolicy="no-referrer">
+        </div></div>
+        <div class="parade-char char3d"><div class="char3d-inner">
+          <img class="char-front" src="https://cdn.mundopixar.com/characters-images/cars-front.webp" alt="Lightning McQueen" referrerpolicy="no-referrer" onerror="this.parentElement.parentElement.outerHTML='<span class=&quot;parade-char is-emoji&quot;>🏎️</span>';">
+          <img class="char-back" src="https://cdn.mundopixar.com/characters-images/cars-back.webp" alt="" referrerpolicy="no-referrer">
+        </div></div>
+      </div>
+      <div class="spot-photo" style="background: linear-gradient(135deg, #FFC72C 0%, #1B7F3A 50%, #5B2D8C 100%);">
+        <img src="https://prcdn.freetls.fastly.net/release_image/11710/3966/11710-3966-3c1a278eb66ab43282bfda8535ddc112-1080x1081.jpg" alt="ピクサーの世界展 メインビジュアル" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex';">
+        <div class="fallback" style="display:none; align-items:center; justify-content:center; width:100%; height:100%;"><div class="icon" style="font-size: 100px;">🤠</div></div>
+        <span class="photo-label" style="background: var(--buzz-purple); color: var(--paper); border-color: var(--paper);">★ MAIN EVENT ★</span>
+      </div>
+      <div class="spot-body">
+        <div class="spot-time" style="background: var(--buzz-purple); box-shadow: 0 3px 0 #3A1A5C;">14:00 〜 16:00</div>
+        <h3 class="spot-name" style="color: var(--buzz-purple);">★ ピクサーの世界展 ★</h3>
+        <p class="spot-desc">
+          10作品の映画世界に実物大で入り込む没入体験！24体以上の等身大キャラクターと記念撮影できる夢のような展示。会場「CREVIA BASE Tokyo」は市場前駅すぐ・徒歩圏内。
+        </p>
+        <div class="spot-meta">
+          ⚠ <strong>13:45集合（15分前ルール）</strong> ／ 抱っこ紐2つ必須（ベビーカー不可）／ 鈴花・大樹は無料（3歳以下）／ 入る前に<strong>トイレ必須</strong>（途中退出不可）
+        </div>
+        <div style="margin: 12px 0; padding: 12px; background: #F4E8FF; border-radius: 8px; border-left: 4px solid var(--buzz-purple); font-size: 13px;">
+          <strong style="color: var(--buzz-purple);">🛍 グッズ売り場</strong>: 限定約500種類！詰め合わせ缶、限定Tシャツ、オリジナルラベル缶（全10種）が人気
+        </div>
+        <div class="spot-links">
+          <a class="btn-link btn-official" href="https://mundopixar.jp/" target="_blank" rel="noopener">▶ 公式サイト</a>
+          <a class="btn-link btn-map" href="https://www.google.com/maps/search/?api=1&query=CREVIA+BASE+Tokyo+%E8%B1%8A%E6%B4%B2" target="_blank" rel="noopener">📍 Googleマップ</a>
+          <a class="btn-link btn-photo" href="https://www.google.com/search?q=%E3%83%94%E3%82%AF%E3%82%B5%E3%83%BC%E3%81%AE%E4%B8%96%E7%95%8C%E5%B1%95&tbm=isch" target="_blank" rel="noopener">📷 写真を見る</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 夕食（当日決定） -->
+    <div class="card spot">
+      <div class="spot-photo" style="background: linear-gradient(135deg, #C8102E 0%, #6B3410 100%);">
+        <div class="icon">🍽</div>
+        <span class="photo-label">★ DINNER ★</span>
+      </div>
+      <div class="spot-body">
+        <div class="spot-time">18:30〜 ／ 当日決定</div>
+        <h3 class="spot-name">夕食 ／ その場で相談</h3>
+        <p class="spot-desc">
+          メンバーの体調・気分・赤ちゃんのコンディションを見て、当日決める。豊洲駅周辺・ららぽーと豊洲・千客万来・ホテル内「季の庭」など選択肢豊富。
+        </p>
+        <div class="spot-meta">
+          💡 <strong>候補例</strong>: 五臓六腑（焼肉・座敷個室）／ 豊洲漁場直送 海鮮居酒屋 ／ ホテル「季の庭」（和食会席・館内）
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Day3 ===== -->
+  <section>
+    <div class="day-header">
+      <h2>★ Day 3 ／ 7月16日 (木)</h2>
+      <span class="day-tag">のんびり朝 → 帰福</span>
+    </div>
+
+    <!-- ▶▶▶ プラン A: 千客万来 ◀◀◀ -->
+    <h3 class="plan-title"><span class="plan-letter">A</span>のんびりプラン ／ 千客万来もう一度</h3>
+    <div class="plan-desc">
+      豊洲エリアでゆっくり、最後まで満喫コース。徒歩で完結、移動ストレスなし。<strong>赤ちゃん連れ・暑さ回避を優先するならコチラ</strong>。
+    </div>
+
+    <!-- 千客万来 食べ歩き -->
+    <div class="card spot">
+      <div class="spot-photo">
+        <img src="https://yakei.jp/photo/1280/senkyakubanrai1-1280.jpg" alt="千客万来 江戸前場下町" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex';">
+        <div class="fallback" style="display:none; align-items:center; justify-content:center; width:100%; height:100%; background: linear-gradient(135deg, #C8102E 0%, #FFC72C 100%);"><div class="icon">🍜</div></div>
+        <span class="photo-label">★ STREET FOOD ★</span>
+      </div>
+      <div class="spot-body">
+        <div class="spot-time">10:30 〜 12:30</div>
+        <h3 class="spot-name">千客万来 食べ歩き＆お土産</h3>
+        <p class="spot-desc">
+          Day1で食べきれなかったグルメを攻略。1Fラーメン店5店舗、おでん、和スイーツも充実。お土産もここで購入完結。徒歩で完結するのでベビーカー・抱っこ紐の負担も少ない。
+        </p>
+        <div class="spot-meta">
+          🍜 <strong>1Fラーメン横丁</strong>: 名店5店舗が集結 ／ 🍡 和スイーツ・おでん横丁あり ／ 🎁 お土産屋多数
+        </div>
+        <div class="spot-links">
+          <a class="btn-link btn-official" href="https://www.toyosu-senkyakubanrai.jp/" target="_blank" rel="noopener">▶ 公式サイト</a>
+          <a class="btn-link btn-map" href="https://www.google.com/maps/search/?api=1&query=%E8%B1%8A%E6%B4%B2%E5%8D%83%E5%AE%A2%E4%B8%87%E6%9D%A5" target="_blank" rel="noopener">📍 Googleマップ</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- プランA / B セパレーター -->
+    <div class="plan-separator">
+      <span class="plan-separator-text">★ OR ／ もう一つの選択肢 ★</span>
+    </div>
+
+    <!-- ▶▶▶ プラン B: お台場 ◀◀◀ -->
+    <h3 class="plan-title"><span class="plan-letter b">B</span>お台場 サブプラン ／ ガンダム＆動物</h3>
+    <div class="plan-desc">
+      豊洲駅から<strong>ゆりかもめで一駅（約8分）</strong>。屋内施設中心で猛暑回避。子供にも喜んでもらえるラインナップ。<strong>体力に余裕があり「もう一段冒険したい」場合はコチラ</strong>。
+    </div>
+
+    <!-- ユニコーンガンダム -->
+    <div class="card spot">
+      <div class="spot-photo" style="background: linear-gradient(135deg, #1E3A5F 0%, #5B2D8C 50%, #C8102E 100%);">
+        <img src="https://www.mitsuifudosan.co.jp/corporate/news/2017/0823/img/20170823_01.jpg" alt="実物大 ユニコーンガンダム立像" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex';">
+        <div class="fallback" style="display:none; align-items:center; justify-content:center; width:100%; height:100%;"><div class="icon" style="font-size: 90px;">🤖</div></div>
+        <span class="photo-label">★ ICON ★</span>
+      </div>
+      <div class="spot-body">
+        <div class="spot-time">10:00 〜 11:00</div>
+        <h3 class="spot-name">実物大 ユニコーンガンダム立像</h3>
+        <p class="spot-desc">
+          ダイバーシティ東京プラザ前。<strong>全高19.7m・重量49t</strong>の超大迫力。屋外なので猛暑日は要注意だが、変身ショーは一見の価値あり。男の子（大樹くん将来用）の写真撮影スポットとしても最高。
+        </p>
+        <div class="spot-meta">
+          🎬 <strong>変身ショー</strong>: 11:00 / 13:00 / 15:00 / 17:00（昼）／ 19:00〜21:30 30分毎（夜）<br>
+          ⏱ <strong>滞在目安</strong>: 30分（変身ショー含めて）／ <strong>無料</strong>
+        </div>
+        <div class="spot-links">
+          <a class="btn-link btn-official" href="https://mitsui-shopping-park.com/divercity-tokyo/" target="_blank" rel="noopener">▶ 公式</a>
+          <a class="btn-link btn-map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%A6%E3%83%8B%E3%82%B3%E3%83%BC%E3%83%B3%E3%82%AC%E3%83%B3%E3%83%80%E3%83%A0%E7%AB%8B%E5%83%8F" target="_blank" rel="noopener">📍 Googleマップ</a>
+          <a class="btn-link btn-photo" href="https://www.google.com/search?q=%E3%83%A6%E3%83%8B%E3%82%B3%E3%83%BC%E3%83%B3%E3%82%AC%E3%83%B3%E3%83%80%E3%83%A0+%E3%81%8A%E5%8F%B0%E5%A0%B4&tbm=isch" target="_blank" rel="noopener">📷 写真を見る</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- アニタッチ -->
+    <div class="card spot">
+      <div class="spot-photo" style="background: linear-gradient(135deg, #FFC72C 0%, #1B7F3A 100%);">
+        <img src="https://assets.st-note.com/img/1690471552974-dTWXYkp1hH.jpg?width=1200" alt="アニタッチ ハリネズミ・小動物ふれあい" onerror="this.onerror=null; this.src='https://assets.st-note.com/img/1690471554151-xlei4Xdto2.jpg?width=1200';">
+        <div class="fallback" style="display:none; align-items:center; justify-content:center; width:100%; height:100%;"><div class="icon" style="font-size: 90px;">🦔</div></div>
+        <span class="photo-label">★ KIDS LOVE ★</span>
+      </div>
+      <div class="spot-body">
+        <div class="spot-time">11:00 〜 12:00</div>
+        <h3 class="spot-name">アニタッチ アクアシティお台場</h3>
+        <p class="spot-desc">
+          屋内型ふれあい動物園。伊豆シャボテン動物公園プロデュース。<strong>モルモット・ウサギ・ハリネズミ・カピバラ・カメレオン・ヘビ</strong>などにゼロ距離で触れ合える。鈴花ちゃんも喜びそう。アクアシティお台場3F。
+        </p>
+        <div class="spot-meta">
+          ⏰ <strong>営業</strong>: 平日11:00〜19:00／土日祝11:00〜21:00<br>
+          💴 <strong>料金</strong>: 平日 大人1,500円・小人800円（4歳〜小学生）／ 土日祝 大人1,800円
+        </div>
+        <div class="spot-links">
+          <a class="btn-link btn-official" href="https://www.odaiba.anitouch.com/" target="_blank" rel="noopener">▶ 公式サイト</a>
+          <a class="btn-link btn-map" href="https://www.google.com/maps/search/?api=1&query=%E3%82%A2%E3%83%8B%E3%82%BF%E3%83%83%E3%83%81+%E3%82%A2%E3%82%AF%E3%82%A2%E3%82%B7%E3%83%86%E3%82%A3%E3%81%8A%E5%8F%B0%E5%A0%B4" target="_blank" rel="noopener">📍 Googleマップ</a>
+          <a class="btn-link btn-photo" href="https://www.google.com/search?q=%E3%82%A2%E3%83%8B%E3%82%BF%E3%83%83%E3%83%81+%E3%82%A2%E3%82%AF%E3%82%A2%E3%82%B7%E3%83%86%E3%82%A3&tbm=isch" target="_blank" rel="noopener">📷 写真を見る</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- アクアシティ お台場 -->
+    <div class="card spot">
+      <div class="spot-photo" style="background: linear-gradient(135deg, #5BB4E8 0%, #2E7FB8 100%);">
+        <img src="https://www.aquacity.jp/img/pc/facility/about/img_rainbowbridge.jpg" alt="アクアシティお台場 レインボーブリッジ眺望" onerror="this.onerror=null; this.src='https://www.aquacity.jp/img/pc/facility/about/img04.jpg';">
+        <div class="fallback" style="display:none; align-items:center; justify-content:center; width:100%; height:100%;"><div class="icon" style="font-size: 90px;">🌉</div></div>
+        <span class="photo-label">★ VIEW ★</span>
+      </div>
+      <div class="spot-body">
+        <div class="spot-time">12:00 〜 13:00 ／ ランチ＆絶景</div>
+        <h3 class="spot-name">アクアシティお台場</h3>
+        <p class="spot-desc">
+          目の前に広がる<strong>レインボーブリッジと自由の女神像</strong>。3F「女神のテラス」は東京一の絶景フォト映えスポット。屋上7Fの「お台場神社」からは東京タワーまで一望。<strong>東京ラーメン国技館</strong>（人気店6店集結）でランチ、<strong>キッズメニュー充実・授乳室・ベビーカー貸出完備</strong>。
+        </p>
+        <div class="spot-meta">
+          🌅 女神のテラス（3F）→ レインボーブリッジ＋自由の女神 ／ 🏯 お台場神社（屋上7F）→ 東京タワー眺望 ／ 🍜 東京ラーメン国技館
+        </div>
+        <div class="spot-links">
+          <a class="btn-link btn-official" href="https://www.aquacity.jp/" target="_blank" rel="noopener">▶ 公式サイト</a>
+          <a class="btn-link btn-map" href="https://www.google.com/maps/search/?api=1&query=%E3%82%A2%E3%82%AF%E3%82%A2%E3%82%B7%E3%83%86%E3%82%A3%E3%81%8A%E5%8F%B0%E5%A0%B4" target="_blank" rel="noopener">📍 Googleマップ</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- レゴランド -->
+    <div class="card spot">
+      <div class="spot-photo" style="background: linear-gradient(135deg, #FFC72C 0%, #C8102E 50%, #1B7F3A 100%);">
+        <img src="https://www.legolanddiscoverycenter.com/tokyo/media/vj3mspsw/7x5-mini-land.jpg" alt="レゴランド東京 ミニランド 東京ジオラマ" onerror="this.onerror=null; this.src='https://prcdn.freetls.fastly.net/release_image/4514/136/4514-136-3240052661d622d07ac835fa53455a96-1908x2700.jpg';">
+        <div class="fallback" style="display:none; align-items:center; justify-content:center; width:100%; height:100%;"><div class="icon" style="font-size: 90px;">🧱</div></div>
+        <span class="photo-label">★ MINILAND ★</span>
+      </div>
+      <div class="spot-body">
+        <div class="spot-time">代替オプション</div>
+        <h3 class="spot-name">レゴランド・ディスカバリー・センター東京</h3>
+        <p class="spot-desc">
+          デックス東京ビーチ内の屋内型レゴ施設。約167万個のブロックで作った東京ジオラマ、4Dシネマ、レゴ教室、<strong>1〜2歳向けの「デュプロ®ビレッジ」</strong>あり。<strong>3歳未満は無料</strong>なので鈴花・大樹はタダ。
+        </p>
+        <div class="spot-meta">
+          ⚠ <strong>0歳・1歳には少し早め</strong>。デュプロビレッジで遊ばせる程度ならOK。中学生以上の同行者がいれば最大限楽しめる。
+        </div>
+        <div class="spot-links">
+          <a class="btn-link btn-official" href="https://www.legolanddiscoverycenter.com/tokyo/" target="_blank" rel="noopener">▶ 公式サイト</a>
+          <a class="btn-link btn-map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%AC%E3%82%B4%E3%83%A9%E3%83%B3%E3%83%89+%E3%83%87%E3%82%A3%E3%82%B9%E3%82%AB%E3%83%90%E3%83%AA%E3%83%BC%E3%82%BB%E3%83%B3%E3%82%BF%E3%83%BC+%E6%9D%B1%E4%BA%AC" target="_blank" rel="noopener">📍 Googleマップ</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- お台場周辺施設まとめ -->
+    <div class="card" style="padding: 22px 28px; background: #FFEFC9; border-color: var(--buzz-purple);">
+      <h3 style="font-family: 'Bangers', cursive; color: var(--buzz-purple); font-size: 22px; margin-bottom: 12px; letter-spacing: 1.5px;">★ お台場 周辺で他に何があるか ★</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; font-size: 13px;">
+        <div><strong style="color: var(--woody-red);">🏬 ダイバーシティ東京プラザ</strong><br>ガンダムの足元。フードコート＆ショッピング</div>
+        <div><strong style="color: var(--woody-red);">💩 うんこミュージアム</strong><br>ダイバーシティ2F。ポップで写真映え</div>
+        <div><strong style="color: var(--woody-red);">🎢 東京ジョイポリス</strong><br>デックス東京ビーチ。屋内テーマパーク</div>
+        <div><strong style="color: var(--woody-red);">🐠 アクアパーク・スクエア</strong><br>アクアシティ5F。タッチプールあり都市型水族館</div>
+        <div><strong style="color: var(--woody-red);">📺 フジテレビ本社</strong><br>球体展望室から東京湾一望</div>
+        <div><strong style="color: var(--woody-red);">🌊 お台場海浜公園</strong><br>レインボーブリッジ眺望（屋外、夏は熱中症注意）</div>
+      </div>
+    </div>
+
+    <!-- 帰路（共通） -->
+    <h3 class="plan-title" style="color: var(--paper);"><span class="plan-letter" style="background: var(--andy-sky-deep); color: var(--paper);">✈</span>帰路 ／ 共通</h3>
+    <div class="card spot">
+      <div class="spot-photo" style="background: linear-gradient(135deg, #2E7FB8 0%, #5BB4E8 100%);">
+        <div class="icon">✈</div>
+        <span class="photo-label">★ FLY HOME ★</span>
+      </div>
+      <div class="spot-body">
+        <div class="spot-time">13:00 〜 17:30</div>
+        <h3 class="spot-name">羽田空港 → 福岡空港</h3>
+        <p class="spot-desc">
+          13:00 <strong>豊洲駅からリムジンバスで羽田直行</strong>（または GO PREMIUM タクシー）→ 13:30〜13:45 到着、ANAラウンジでひと休み（プラチナ特典）→ 15:25 ANA257発 → 17:30頃 福岡着。優先搭乗で赤ちゃん連れも余裕。
+        </p>
+        <div class="spot-links">
+          <a class="btn-link btn-official" href="https://tokyo-haneda.com/" target="_blank" rel="noopener">▶ 羽田空港</a>
+          <a class="btn-link btn-map" href="https://www.google.com/maps/search/?api=1&query=%E7%BE%BD%E7%94%B0%E7%A9%BA%E6%B8%AF" target="_blank" rel="noopener">📍 Googleマップ</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 持ち物・注意 -->
+  <section>
+    <h2 class="section-title"><span class="badge">📋</span>準備リスト</h2>
+    <div class="card" style="padding: 24px 28px;">
+      <ul class="note-list">
+        <li><strong>抱っこ紐 × 2</strong>（チームラボ・ピクサー展・千客万来すべてで必須）</li>
+        <li><strong>足湯用タオル</strong>（千客万来 8F足湯庭園で使用）</li>
+        <li><strong>チームラボ用の着替え</strong>（水エリアあり、子供は確実に濡れる）</li>
+        <li><strong>GO PREMIUMアプリ</strong>を事前インストール＆登録（6人乗りワゴン配車）</li>
+        <li><strong>ベビーベッド × 2</strong> をホテル予約時に申し込み</li>
+        <li>出発前に <strong>豊洲市場 7/15(水)の営業確認</strong>（水曜休市の可能性）</li>
+        <li>出発前に <strong>千客万来の店舗別営業時間</strong> を確認</li>
+      </ul>
+    </div>
+  </section>
+
+
+</div>
+
+<!-- フッター -->
+<footer class="footer">
+  ★ Have a Great Trip, Partner! ★
+  <br>
+  <div class="andy-stamp">ANDY</div>
+</footer>
+
+<!-- 音楽プレーヤー（トイストーリー主題歌「君はともだち / You've Got a Friend in Me」） -->
+<div id="music-player">
+  <button id="music-toggle" onclick="toggleMusic()" aria-label="音楽再生">
+    <span id="music-label">♪ Play "君はともだち"</span>
+  </button>
+  <div id="player-container" style="display:none;">
+    <iframe
+      id="yt-player"
+      width="280"
+      height="158"
+      src=""
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen>
+    </iframe>
+    <div id="music-fallback" style="display:none; padding:14px 16px; background:var(--paper); color:var(--woody-brown); font-size:12px; text-align:center; border-top:3px solid var(--woody-brown);">
+      ⚠ 埋め込み再生エラー<br>
+      <a href="https://www.youtube.com/results?search_query=youve+got+a+friend+in+me+toy+story" target="_blank" rel="noopener" style="color:var(--woody-red); font-weight:700;">YouTubeで開く ▶</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// 候補となるYouTube動画ID（埋め込み許可されている可能性が高い順）
+const VIDEO_IDS = ['1MPZRcyTrcU', 'JbjIH5pvT5A', '0hG-2tQtdlE', 'DNZUKm0ApEM', 'HPtVKob_mDU', 'EcXURC_nNhc'];
+let currentVideoIndex = 0;
+let errorTimer = null;
+
+function buildEmbedUrl(id) {
+  return `https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playlist=${id}&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
+}
+
+function startJourney(skipMusic) {
+  const overlay = document.getElementById('welcome-overlay');
+  overlay.classList.add('closing');
+  setTimeout(() => { overlay.style.display = 'none'; }, 400);
+  if (!skipMusic) {
+    playMusic();
+  }
+}
+
+function playMusic() {
+  const container = document.getElementById('player-container');
+  const iframe = document.getElementById('yt-player');
+  const btn = document.getElementById('music-toggle');
+  const label = document.getElementById('music-label');
+  const fallback = document.getElementById('music-fallback');
+  fallback.style.display = 'none';
+  iframe.src = buildEmbedUrl(VIDEO_IDS[currentVideoIndex]);
+  container.style.display = 'block';
+  btn.classList.add('playing');
+  label.textContent = '⏸ Pause Theme';
+}
+
+function stopMusic() {
+  const container = document.getElementById('player-container');
+  const iframe = document.getElementById('yt-player');
+  const btn = document.getElementById('music-toggle');
+  const label = document.getElementById('music-label');
+  iframe.src = '';
+  container.style.display = 'none';
+  btn.classList.remove('playing');
+  label.textContent = '♪ Play "君はともだち"';
+  currentVideoIndex = 0;
+}
+
+function toggleMusic() {
+  const container = document.getElementById('player-container');
+  if (container.style.display === 'none' || container.style.display === '') {
+    playMusic();
+  } else {
+    stopMusic();
+  }
+}
+
+function tryNextVideo() {
+  if (currentVideoIndex < VIDEO_IDS.length - 1) {
+    currentVideoIndex++;
+    const iframe = document.getElementById('yt-player');
+    iframe.src = buildEmbedUrl(VIDEO_IDS[currentVideoIndex]);
+  } else {
+    // 全ID試して失敗 → フォールバック表示
+    document.getElementById('music-fallback').style.display = 'block';
+  }
+}
+
+// YouTube IFrame APIのエラーメッセージを監視
+window.addEventListener('message', (event) => {
+  if (event.origin !== 'https://www.youtube.com') return;
+  try {
+    const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+    if (data && (data.event === 'onError' || (data.info && data.info.errorCode))) {
+      tryNextVideo();
+    }
+  } catch (e) { /* ignore */ }
+});
+</script>
+
+</body>
+</html>
