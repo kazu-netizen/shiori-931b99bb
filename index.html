@@ -364,6 +364,213 @@
     .character-aliens span { font-size: 28px; }
   }
 
+  /* === 🎈 Up（カールじいさんの家）の風船 === */
+  .balloon {
+    position: fixed;
+    bottom: -100px;
+    width: 32px;
+    height: 40px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    pointer-events: none;
+    z-index: 1;
+    animation: balloonFloat 18s linear infinite;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+  }
+  .balloon::after {
+    content: '';
+    position: absolute;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 60px;
+    background: rgba(255,255,255,0.6);
+  }
+  @keyframes balloonFloat {
+    0% { bottom: -100px; transform: translateX(0) rotate(-5deg); }
+    50% { transform: translateX(40px) rotate(5deg); }
+    100% { bottom: 110vh; transform: translateX(-20px) rotate(-3deg); }
+  }
+
+  /* === 🎀 マスキングテープ装飾 === */
+  .masking-tape {
+    position: absolute;
+    width: 80px;
+    height: 22px;
+    background: rgba(255, 199, 44, 0.7);
+    transform: rotate(-15deg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    z-index: 4;
+    pointer-events: none;
+  }
+  .masking-tape::before, .masking-tape::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 4px; height: 100%;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent 0 3px,
+      rgba(255,255,255,0.3) 3px 5px
+    );
+  }
+  .masking-tape::before { left: 0; }
+  .masking-tape::after { right: 0; }
+  .tape-tl { top: -8px; left: -20px; transform: rotate(-15deg); }
+  .tape-tr { top: -8px; right: -20px; transform: rotate(12deg); background: rgba(200, 16, 46, 0.6); }
+  .tape-bl { bottom: -8px; left: -20px; transform: rotate(8deg); background: rgba(91, 45, 140, 0.6); }
+  .tape-br { bottom: -8px; right: -20px; transform: rotate(-12deg); background: rgba(27, 127, 58, 0.65); }
+
+  /* === ✨ マウストレイル星 === */
+  .cursor-star {
+    position: fixed;
+    width: 12px; height: 12px;
+    pointer-events: none;
+    z-index: 9999;
+    background: var(--woody-yellow);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    animation: cursorStarFade 0.8s ease-out forwards;
+  }
+  @keyframes cursorStarFade {
+    0% { opacity: 1; transform: scale(1) rotate(0deg); }
+    100% { opacity: 0; transform: scale(0.3) rotate(180deg) translateY(20px); }
+  }
+
+  /* === 🌟 クリックパーティクル === */
+  .click-particle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    font-size: 24px;
+    animation: clickParticleBurst 1s ease-out forwards;
+  }
+  @keyframes clickParticleBurst {
+    0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.5) rotate(360deg); }
+  }
+
+  /* === ⏱ カウントダウン === */
+  .countdown {
+    margin-top: 24px;
+    background: var(--paper);
+    border: 4px solid var(--woody-brown);
+    border-radius: 24px;
+    padding: 18px 28px;
+    box-shadow: 0 8px 0 var(--woody-brown), 0 14px 28px rgba(0,0,0,0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    transform: rotate(-1deg);
+    position: relative;
+    z-index: 3;
+  }
+  .countdown-label {
+    font-family: 'Bangers', cursive;
+    color: var(--woody-red);
+    font-size: clamp(14px, 2vw, 18px);
+    letter-spacing: 1.5px;
+  }
+  .countdown-numbers {
+    display: flex;
+    gap: 8px;
+  }
+  .countdown-block {
+    background: var(--woody-red);
+    color: var(--paper);
+    border-radius: 10px;
+    padding: 8px 12px;
+    min-width: 56px;
+    text-align: center;
+    border: 3px solid var(--woody-brown);
+    box-shadow: 0 4px 0 var(--woody-brown);
+  }
+  .countdown-block .num {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: clamp(20px, 3vw, 28px);
+    line-height: 1;
+    display: block;
+  }
+  .countdown-block .unit {
+    font-size: 10px;
+    letter-spacing: 1px;
+    opacity: 0.85;
+  }
+
+  /* === 📜 紙テクスチャ === */
+  .card, .info-card, .welcome-card {
+    background-image:
+      var(--paper-grain, none),
+      linear-gradient(180deg, var(--paper) 0%, #FFF2D5 100%);
+    background-blend-mode: multiply;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 30%, transparent 0%, rgba(0,0,0,0.02) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* === 🏃 スクロール登場アニメーション === */
+  .reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+    transition: opacity 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .reveal-on-scroll.revealed {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /* === 🎵 音楽プレーヤーの曲切替ボタン === */
+  .music-track-toggle {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .music-track-toggle button {
+    flex: 1;
+    background: var(--paper);
+    color: var(--woody-brown);
+    border: 2px solid var(--woody-brown);
+    border-radius: 12px;
+    font-family: 'Bangers', cursive;
+    font-size: 10px;
+    padding: 4px 8px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: background 0.15s;
+  }
+  .music-track-toggle button.active {
+    background: var(--woody-red);
+    color: var(--paper);
+  }
+
+  /* === ヒーロー強化（光のキラメキ） === */
+  .hero::before, .hero::after {
+    box-shadow: 60px 20px 0 -10px var(--andy-cloud), 120px 40px 0 -15px var(--andy-cloud);
+  }
+  .hero-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 80%;
+    background: radial-gradient(ellipse, rgba(255, 199, 44, 0.25) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+    animation: heroGlowPulse 4s ease-in-out infinite;
+  }
+  @keyframes heroGlowPulse {
+    0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  }
+
   /* === キャラクター歓迎パレード（ピクサー展カード上） === */
   .character-parade {
     position: absolute;
@@ -1192,6 +1399,15 @@
   <div class="cloud cloud-3"></div>
 </div>
 
+<!-- 🎈 カールじいさんの風船 -->
+<div class="balloon" style="left: 8%; background: #C8102E; animation-delay: 0s; animation-duration: 22s;"></div>
+<div class="balloon" style="left: 18%; background: #FFC72C; animation-delay: 3s; animation-duration: 20s; width: 28px; height: 36px;"></div>
+<div class="balloon" style="left: 32%; background: #1B7F3A; animation-delay: 7s; animation-duration: 24s;"></div>
+<div class="balloon" style="left: 48%; background: #5B2D8C; animation-delay: 1s; animation-duration: 19s; width: 30px; height: 38px;"></div>
+<div class="balloon" style="left: 62%; background: #FF6B35; animation-delay: 5s; animation-duration: 23s;"></div>
+<div class="balloon" style="left: 75%; background: #5BB4E8; animation-delay: 9s; animation-duration: 21s; width: 34px; height: 42px;"></div>
+<div class="balloon" style="left: 88%; background: #E8B86E; animation-delay: 12s; animation-duration: 25s;"></div>
+
 <!-- バズ・ライトイヤー（本物）が宇宙でクルクル回転しながら飛ぶ -->
 <div class="character-buzz char3d" aria-hidden="true">
   <div class="char3d-inner">
@@ -1234,6 +1450,9 @@
 
 <!-- ヒーロー -->
 <header class="hero">
+  <!-- ヒーロー光るグロー -->
+  <div class="hero-glow" aria-hidden="true"></div>
+
   <!-- 装飾の星 -->
   <span class="twinkle-star" style="top: 30px; left: 8%; animation-delay: 0s;"></span>
   <span class="twinkle-star" style="top: 60px; right: 12%; width: 18px; height: 18px; animation-delay: 0.5s;"></span>
@@ -1250,6 +1469,18 @@
     <img src="https://prcdn.freetls.fastly.net/release_image/11710/3966/11710-3966-3c1a278eb66ab43282bfda8535ddc112-1080x1081.jpg" alt="ピクサーの世界展 メインビジュアル" onerror="this.style.display='none';">
   </div>
   <div class="dates">2026.07.14 (火) 〜 07.16 (木) ／ 2泊3日 ／ 家族6人</div>
+
+  <!-- ⏱ 旅までのカウントダウン -->
+  <div class="countdown" role="timer" aria-live="polite">
+    <span class="countdown-label">★ 旅まであと ★</span>
+    <div class="countdown-numbers">
+      <div class="countdown-block"><span class="num" id="cd-days">--</span><span class="unit">DAYS</span></div>
+      <div class="countdown-block"><span class="num" id="cd-hours">--</span><span class="unit">HOURS</span></div>
+      <div class="countdown-block"><span class="num" id="cd-minutes">--</span><span class="unit">MIN</span></div>
+      <div class="countdown-block"><span class="num" id="cd-seconds">--</span><span class="unit">SEC</span></div>
+    </div>
+  </div>
+
   <div class="family">
     <span class="member"><span class="emoji">🤠</span>一貴</span>
     <span class="member"><span class="emoji">👩</span>鈴依奈</span>
@@ -1785,6 +2016,11 @@
       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
       loading="lazy">
     </iframe>
+    <div class="music-track-toggle" role="tablist">
+      <button type="button" data-track="friend" class="active" onclick="switchTrack('friend')">🤠 君はともだち</button>
+      <button type="button" data-track="remember" onclick="switchTrack('remember')">💀 リメンバーミー</button>
+      <button type="button" data-track="circle" onclick="switchTrack('circle')">🦁 サークル・オブ・ライフ</button>
+    </div>
     <div id="music-fallback" style="display:none; padding:14px 16px; background:var(--paper); color:var(--woody-brown); font-size:12px; text-align:center; border-top:3px solid var(--woody-brown);">
       ⚠ 埋め込み再生エラー<br>
       <a href="https://open.spotify.com/track/2stkLJ0JNcXkIRDNF3ld6c" target="_blank" rel="noopener" style="color:var(--woody-red); font-weight:700;">Spotifyで開く ▶</a>
@@ -1858,6 +2094,112 @@ function tryNextVideo() {
     document.getElementById('music-fallback').style.display = 'block';
   }
 }
+
+// === 🎵 楽曲切替 ===
+const TRACK_LIBRARY = {
+  friend: { id: '2stkLJ0JNcXkIRDNF3ld6c', name: '君はともだち' },
+  remember: { id: '0FVT2bRQXKYBYYRP05PKK6', name: 'リメンバーミー' },
+  circle: { id: '1uS9ZOfn1yHj0ar9qK2jdL', name: 'サークル・オブ・ライフ' }
+};
+function switchTrack(key) {
+  document.querySelectorAll('.music-track-toggle button').forEach(b => {
+    b.classList.toggle('active', b.dataset.track === key);
+  });
+  const iframe = document.getElementById('yt-player');
+  iframe.src = buildEmbedUrl(TRACK_LIBRARY[key].id);
+}
+
+// === ⏱ カウントダウン（旅まであと） ===
+function updateCountdown() {
+  const target = new Date('2026-07-14T10:15:00+09:00').getTime();
+  const now = Date.now();
+  const diff = target - now;
+  if (diff <= 0) {
+    ['cd-days','cd-hours','cd-minutes','cd-seconds'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '00';
+    });
+    return;
+  }
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+  const set = (id, n) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = String(n).padStart(2, '0');
+  };
+  set('cd-days', days);
+  set('cd-hours', hours);
+  set('cd-minutes', minutes);
+  set('cd-seconds', seconds);
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// === ✨ マウストレイル星 ===
+let lastTrailTime = 0;
+document.addEventListener('mousemove', (e) => {
+  const now = Date.now();
+  if (now - lastTrailTime < 80) return;
+  lastTrailTime = now;
+  const star = document.createElement('div');
+  star.className = 'cursor-star';
+  star.style.left = (e.clientX - 6) + 'px';
+  star.style.top = (e.clientY - 6) + 'px';
+  const colors = ['#FFC72C', '#C8102E', '#1B7F3A', '#5BB4E8', '#5B2D8C'];
+  star.style.background = colors[Math.floor(Math.random() * colors.length)];
+  document.body.appendChild(star);
+  setTimeout(() => star.remove(), 800);
+});
+
+// === 🌟 クリックパーティクル ===
+document.addEventListener('click', (e) => {
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'button' || tag === 'a' || tag === 'iframe' || e.target.closest('a,button,iframe')) return;
+  const emojis = ['⭐', '✨', '🌟', '💫', '🤠', '🚀'];
+  for (let i = 0; i < 8; i++) {
+    const p = document.createElement('div');
+    p.className = 'click-particle';
+    p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    p.style.left = e.clientX + 'px';
+    p.style.top = e.clientY + 'px';
+    const angle = (Math.PI * 2 * i) / 8;
+    const distance = 80 + Math.random() * 60;
+    p.style.setProperty('--dx', Math.cos(angle) * distance + 'px');
+    p.style.setProperty('--dy', Math.sin(angle) * distance + 'px');
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1000);
+  }
+});
+
+// === 🏃 スクロール連動（Intersection Observer） ===
+window.addEventListener('DOMContentLoaded', () => {
+  const targets = document.querySelectorAll('.container > section, .container .card');
+  targets.forEach(el => el.classList.add('reveal-on-scroll'));
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    targets.forEach(el => io.observe(el));
+  } else {
+    targets.forEach(el => el.classList.add('revealed'));
+  }
+
+  // 🎀 マスキングテープを各カードに自動付与
+  document.querySelectorAll('.container .card').forEach((card, idx) => {
+    const positions = ['tape-tl', 'tape-tr', 'tape-bl', 'tape-br'];
+    const pos = positions[idx % positions.length];
+    const tape = document.createElement('div');
+    tape.className = 'masking-tape ' + pos;
+    card.appendChild(tape);
+  });
+});
 </script>
 
 </body>
