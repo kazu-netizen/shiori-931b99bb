@@ -621,6 +621,75 @@
     .btn-link { padding: 10px 14px; min-height: 40px; font-size: 12px; }
   }
 
+  /* === キャラクターディバイダー（セクション間ガイド） === */
+  .char-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin: 36px 0 28px;
+    padding: 0 16px;
+    position: relative;
+    z-index: 3;
+  }
+  .char-divider .divider-char {
+    width: 70px;
+    height: 105px;
+    flex-shrink: 0;
+    object-fit: contain;
+    filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.4));
+    animation: dividerBob 2s ease-in-out infinite;
+  }
+  .char-divider .divider-emoji {
+    font-size: 56px;
+    line-height: 1;
+    flex-shrink: 0;
+    filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.3));
+    animation: dividerBob 2.4s ease-in-out infinite;
+  }
+  @keyframes dividerBob {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+  }
+  .divider-bubble {
+    background: var(--paper);
+    border: 4px solid var(--woody-brown);
+    border-radius: 22px;
+    padding: 10px 18px;
+    font-family: 'Bangers', cursive;
+    letter-spacing: 1.5px;
+    color: var(--woody-red);
+    font-size: 16px;
+    box-shadow: 0 4px 0 var(--woody-brown), 0 8px 16px rgba(0,0,0,0.2);
+    position: relative;
+    transform: rotate(-2deg);
+    text-align: center;
+  }
+  .divider-bubble::before {
+    content: '';
+    position: absolute;
+    left: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 10px 14px 10px 0;
+    border-color: transparent var(--woody-brown) transparent transparent;
+  }
+  .char-divider.right-side { flex-direction: row-reverse; }
+  .char-divider.right-side .divider-bubble { transform: rotate(2deg); }
+  .char-divider.right-side .divider-bubble::before {
+    left: auto; right: -14px;
+    border-width: 10px 0 10px 14px;
+    border-color: transparent transparent transparent var(--woody-brown);
+  }
+  @media (max-width: 600px) {
+    .char-divider { margin: 28px 0 20px; gap: 10px; padding: 0 8px; }
+    .char-divider .divider-char { width: 56px; height: 84px; }
+    .char-divider .divider-emoji { font-size: 42px; }
+    .divider-bubble { font-size: 13px; padding: 8px 14px; border-width: 3px; }
+  }
+
   /* === スマホ最適化（読みやすさ強化） === */
   @media (max-width: 600px) {
     .container { padding: 0 14px 60px; }
@@ -1765,6 +1834,12 @@
     </div>
   </section>
 
+  <!-- ディバイダー: バズが「Let's Go!」 -->
+  <div class="char-divider" aria-hidden="true">
+    <img class="divider-char" src="https://static.wikia.nocookie.net/pixar/images/5/55/Buzz_Lightyear_ts4.png.png/revision/latest" alt="Buzz" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=&quot;divider-emoji&quot;>🚀</span>';">
+    <div class="divider-bubble">Let's Go!<br>東京へ出発！</div>
+  </div>
+
   <!-- 航空券・ホテル概要 -->
   <section>
     <h2 class="section-title"><span class="badge">✈</span>移動・宿泊</h2>
@@ -1823,6 +1898,12 @@
     </div>
   </section>
 
+  <!-- ディバイダー: サリーが「ホテル到着！」 -->
+  <div class="char-divider right-side" aria-hidden="true">
+    <img class="divider-char" src="https://cdn.mundopixar.com/characters-images/sulley-front.webp" alt="Sully" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=&quot;divider-emoji&quot;>👹</span>';">
+    <div class="divider-bubble">ホテル到着！<br>ベビーベッドあり🐻</div>
+  </div>
+
   <!-- ホテル -->
   <section>
     <h2 class="section-title"><span class="badge">🏨</span>ホテル</h2>
@@ -1850,6 +1931,12 @@
       </div>
     </div>
   </section>
+
+  <!-- ディバイダー: ジョイが「Day 1 スタート！」 -->
+  <div class="char-divider" aria-hidden="true">
+    <img class="divider-char" src="https://cdn.mundopixar.com/characters-images/joy-front.webp" alt="Joy" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=&quot;divider-emoji&quot;>😊</span>';">
+    <div class="divider-bubble">さあ Day 1<br>スタート！</div>
+  </div>
 
   <!-- ===== Day1 ===== -->
   <section>
@@ -1929,6 +2016,12 @@
       </div>
     </div>
   </section>
+
+  <!-- ディバイダー: 月で Zzz... -->
+  <div class="char-divider right-side" aria-hidden="true">
+    <span class="divider-emoji">🌙</span>
+    <div class="divider-bubble">おやすみ〜<br>Zzz... ★</div>
+  </div>
 
   <!-- ===== Day2 ===== -->
   <section>
@@ -2029,6 +2122,12 @@
       </div>
     </div>
   </section>
+
+  <!-- ディバイダー: 太陽で「最終日！」 -->
+  <div class="char-divider" aria-hidden="true">
+    <span class="divider-emoji">🌅</span>
+    <div class="divider-bubble">おはよう！<br>最終日だよ ☀</div>
+  </div>
 
   <!-- ===== Day3 ===== -->
   <section>
@@ -2195,6 +2294,12 @@
       </div>
     </div>
   </section>
+
+  <!-- ディバイダー: ドリーが「忘れ物ない？」 -->
+  <div class="char-divider right-side" aria-hidden="true">
+    <img class="divider-char" src="https://cdn.mundopixar.com/characters-images/dori-front.webp" alt="Dory" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=&quot;divider-emoji&quot;>🐠</span>';">
+    <div class="divider-bubble">忘れ物<br>ないかな？🎒</div>
+  </div>
 
   <!-- 持ち物・注意 -->
   <section>
