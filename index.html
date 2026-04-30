@@ -34,16 +34,13 @@
   body {
     font-family: 'Noto Sans JP', sans-serif;
     color: var(--ink);
-    background: var(--andy-sky);
+    background-color: var(--andy-sky);
     background-image:
-      radial-gradient(ellipse 100px 50px at 12% 10%, var(--andy-cloud) 0%, transparent 70%),
-      radial-gradient(ellipse 140px 60px at 88% 22%, var(--andy-cloud) 0%, transparent 70%),
-      radial-gradient(ellipse 110px 55px at 25% 45%, var(--andy-cloud) 0%, transparent 70%),
-      radial-gradient(ellipse 130px 60px at 70% 65%, var(--andy-cloud) 0%, transparent 70%),
-      radial-gradient(ellipse 90px 45px at 8% 78%, var(--andy-cloud) 0%, transparent 70%),
-      radial-gradient(ellipse 120px 55px at 95% 88%, var(--andy-cloud) 0%, transparent 70%),
+      url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 180' width='240' height='180'%3E%3Cg fill='%23FFFFFF' opacity='0.92'%3E%3Cellipse cx='60' cy='40' rx='32' ry='12'/%3E%3Cellipse cx='42' cy='32' rx='20' ry='14'/%3E%3Cellipse cx='78' cy='32' rx='22' ry='15'/%3E%3Cellipse cx='62' cy='25' rx='14' ry='10'/%3E%3C/g%3E%3Cg fill='%23FFFFFF' opacity='0.85'%3E%3Cellipse cx='180' cy='110' rx='34' ry='13'/%3E%3Cellipse cx='160' cy='102' rx='22' ry='15'/%3E%3Cellipse cx='200' cy='102' rx='24' ry='16'/%3E%3Cellipse cx='180' cy='95' rx='15' ry='11'/%3E%3C/g%3E%3Cg fill='%23FFFFFF' opacity='0.78'%3E%3Cellipse cx='30' cy='150' rx='28' ry='11'/%3E%3Cellipse cx='14' cy='143' rx='18' ry='13'/%3E%3Cellipse cx='44' cy='143' rx='20' ry='14'/%3E%3C/g%3E%3C/svg%3E"),
       linear-gradient(180deg, var(--andy-sky) 0%, var(--andy-sky-deep) 100%);
-    background-attachment: fixed;
+    background-repeat: repeat, no-repeat;
+    background-size: 240px 180px, 100% 100%;
+    background-attachment: fixed, fixed;
     line-height: 1.7;
     min-height: 100vh;
     overflow-x: hidden;
@@ -262,11 +259,15 @@
     gap: -6px;
     animation: alienPop 8s ease-in-out infinite;
   }
-  .character-aliens span {
+  .character-aliens span,
+  .character-aliens img {
     font-size: 36px;
+    width: 50px;
+    height: auto;
     display: inline-block;
     filter: drop-shadow(0 3px 6px rgba(27, 127, 58, 0.6));
   }
+  .character-aliens span { width: auto; }
   .character-aliens span:nth-child(1) { animation: alienBobA 1.6s ease-in-out infinite; }
   .character-aliens span:nth-child(2) { animation: alienBobB 1.6s ease-in-out infinite 0.2s; }
   .character-aliens span:nth-child(3) { animation: alienBobC 1.6s ease-in-out infinite 0.4s; }
@@ -1416,20 +1417,20 @@
   </div>
 </div>
 
-<!-- カーズが走る・3D振り返り（前面: Wikia走行ポーズ、背面: mundopixar） -->
+<!-- カーズが走る・3D振り返り（透過webpで切り抜き） -->
 <div class="character-cars char3d" aria-hidden="true">
   <div class="char3d-inner">
-    <img class="char-front" src="https://static.wikia.nocookie.net/pixar/images/0/0e/Cars-3-lightning-mcqueen.jpg/revision/latest" alt="Lightning McQueen" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='https://cdn.mundopixar.com/characters-images/cars-front.webp';">
+    <img class="char-front" src="https://cdn.mundopixar.com/characters-images/cars-front.webp" alt="Lightning McQueen" referrerpolicy="no-referrer" onerror="this.parentElement.parentElement.outerHTML='<div class=&quot;character-cars is-emoji&quot; aria-hidden=&quot;true&quot;>🏎️</div>';">
     <img class="char-back" src="https://cdn.mundopixar.com/characters-images/cars-back.webp" alt="Cars Back" referrerpolicy="no-referrer">
   </div>
 </div>
 
-<!-- リトル・グリーンメン（エイリアン）がポップアップ -->
+<!-- リトル・グリーンメン（本物のPixar画像）がポップアップ -->
 <div class="character-aliens" aria-hidden="true">
   <div class="alien-speech">OOOOH!</div>
-  <span>👽</span>
-  <span>👽</span>
-  <span>👽</span>
+  <img src="https://static.wikia.nocookie.net/pixar/images/3/3c/Aliens0001.png/revision/latest" alt="LGM" referrerpolicy="no-referrer" onerror="this.outerHTML='<span>👽</span>';">
+  <img src="https://static.wikia.nocookie.net/pixar/images/3/3c/Aliens0001.png/revision/latest" alt="LGM" referrerpolicy="no-referrer" onerror="this.outerHTML='<span>👽</span>';">
+  <img src="https://static.wikia.nocookie.net/pixar/images/3/3c/Aliens0001.png/revision/latest" alt="LGM" referrerpolicy="no-referrer" onerror="this.outerHTML='<span>👽</span>';">
 </div>
 
 <!-- ウェルカムオーバーレイ（自動再生スタート） -->
@@ -1749,7 +1750,7 @@
           <img class="char-back" src="https://cdn.mundopixar.com/characters-images/joy-back.webp" alt="" referrerpolicy="no-referrer">
         </div></div>
         <div class="parade-char char3d"><div class="char3d-inner">
-          <img class="char-front" src="https://static.wikia.nocookie.net/pixar/images/0/0e/Cars-3-lightning-mcqueen.jpg/revision/latest" alt="Lightning McQueen" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='https://cdn.mundopixar.com/characters-images/cars-front.webp';">
+          <img class="char-front" src="https://cdn.mundopixar.com/characters-images/cars-front.webp" alt="Lightning McQueen" referrerpolicy="no-referrer" onerror="this.parentElement.parentElement.outerHTML='<span class=&quot;parade-char is-emoji&quot;>🏎️</span>';">
           <img class="char-back" src="https://cdn.mundopixar.com/characters-images/cars-back.webp" alt="" referrerpolicy="no-referrer">
         </div></div>
       </div>
@@ -2017,9 +2018,9 @@
       loading="lazy">
     </iframe>
     <div class="music-track-toggle" role="tablist">
-      <button type="button" data-track="friend" class="active" onclick="switchTrack('friend')">🤠 君はともだち</button>
-      <button type="button" data-track="remember" onclick="switchTrack('remember')">💀 リメンバーミー</button>
-      <button type="button" data-track="circle" onclick="switchTrack('circle')">🦁 サークル・オブ・ライフ</button>
+      <button type="button" data-track="friend" class="active" onclick="switchTrack('friend')">🤠 ともだち</button>
+      <button type="button" data-track="remember" onclick="switchTrack('remember')">💀 リメンバー</button>
+      <button type="button" data-track="married" onclick="switchTrack('married')">🎈 UP</button>
     </div>
     <div id="music-fallback" style="display:none; padding:14px 16px; background:var(--paper); color:var(--woody-brown); font-size:12px; text-align:center; border-top:3px solid var(--woody-brown);">
       ⚠ 埋め込み再生エラー<br>
@@ -2095,11 +2096,11 @@ function tryNextVideo() {
   }
 }
 
-// === 🎵 楽曲切替 ===
+// === 🎵 楽曲切替（全てピクサー公式作品） ===
 const TRACK_LIBRARY = {
   friend: { id: '2stkLJ0JNcXkIRDNF3ld6c', name: '君はともだち' },
-  remember: { id: '0FVT2bRQXKYBYYRP05PKK6', name: 'リメンバーミー' },
-  circle: { id: '1uS9ZOfn1yHj0ar9qK2jdL', name: 'サークル・オブ・ライフ' }
+  remember: { id: '0UUBEcwtRgxdqhJTAW7y4C', name: 'リメンバーミー (Coco)' },
+  married: { id: '5IUCgTMWowgdNFi5xGEKhZ', name: 'Married Life (Up)' }
 };
 function switchTrack(key) {
   document.querySelectorAll('.music-track-toggle button').forEach(b => {
