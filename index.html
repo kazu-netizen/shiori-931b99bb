@@ -600,8 +600,53 @@
 
   /* タッチターゲット最適化 */
   @media (max-width: 600px) {
-    .music-track-toggle button { padding: 8px 6px; min-height: 40px; }
-    .btn-link { padding: 10px 16px; min-height: 40px; }
+    .music-track-toggle button { padding: 8px 6px; min-height: 40px; font-size: 11px; }
+    .btn-link { padding: 10px 14px; min-height: 40px; font-size: 12px; }
+  }
+
+  /* === スマホ最適化（読みやすさ強化） === */
+  @media (max-width: 600px) {
+    .container { padding: 0 14px 60px; }
+    section { margin-bottom: 36px; }
+    .hero { padding: 40px 16px 50px; }
+    .info-grid { grid-template-columns: 1fr; gap: 14px; }
+    .info-card { padding: 16px 18px; }
+    .info-card h3 { font-size: 18px; }
+    .info-card .row { font-size: 13px; padding: 5px 0; }
+    .spot { grid-template-columns: 1fr; }
+    .spot-photo { min-height: 180px; }
+    .spot-photo img { min-height: 180px; }
+    .spot-body { padding: 18px 18px 22px; }
+    .spot-name { font-size: 21px; line-height: 1.25; }
+    .spot-desc { font-size: 13.5px; line-height: 1.65; margin-bottom: 12px; }
+    .spot-meta { font-size: 12px; padding: 7px 10px; }
+    .spot-time { font-size: 12px; padding: 3px 12px; }
+    .day-header { padding: 14px 18px; }
+    .day-header h2 { font-size: 22px; }
+    .day-header .day-tag { font-size: 12px; padding: 4px 12px; }
+    .section-title { font-size: 24px; gap: 10px; }
+    .section-title .badge { width: 44px; height: 44px; font-size: 22px; }
+    .section-title::after { height: 4px; }
+    .countdown { padding: 12px 16px; gap: 10px; }
+    .countdown-block { min-width: 44px; padding: 6px 8px; }
+    .countdown-block .num { font-size: 20px; }
+    .countdown-block .unit { font-size: 8px; }
+    .plan-title { font-size: 20px; gap: 10px; }
+    .plan-title .plan-letter { width: 38px; height: 38px; font-size: 20px; }
+    .plan-desc { font-size: 13px; padding: 10px 14px; }
+    .plan-separator { margin: 36px 0 24px; }
+    .plan-separator-text { font-size: 14px; padding: 6px 16px; }
+    .character-parade { top: -65px; gap: 8px; }
+    .character-parade .parade-char { width: 50px; height: 78px; }
+    .note-list li { font-size: 13px; padding: 9px 12px 9px 32px; }
+    .note-list li::before { left: 10px; font-size: 14px; }
+    .family { gap: 6px; }
+    .member { font-size: 11px; padding: 5px 10px; }
+    .hero h1 { font-size: 38px; }
+    .hero .subtitle { font-size: 15px; letter-spacing: 2px; }
+    .pixar-logo img { max-width: 220px; }
+    .hero-visual { max-width: 90%; border-width: 4px; }
+    .character-woody { width: 90px; height: 140px; bottom: 0; }
   }
 
   /* === 🎵 音楽プレーヤーの曲切替ボタン === */
@@ -1517,12 +1562,11 @@
     <h2 class="welcome-title">★ Welcome, Partner! ★</h2>
     <p class="welcome-sub">ピクサーの世界展<br>家族旅行のしおり</p>
     <button id="welcome-start" onclick="startJourney()">
-      ♪ "君はともだち" 日本語版を流す
+      ♪ 君はともだち を流す
     </button>
     <button id="welcome-skip" onclick="startJourney(true)">
-      Skip Music
+      音楽なし
     </button>
-    <p class="welcome-note" id="welcome-note-msg">Diamond Yukai 日本語版（広告なし）<br><small style="opacity:0.7;">※Spotifyログイン済 → 自動再生／未ログイン → プレーヤーの▶をタップ</small></p>
   </div>
 </div>
 
@@ -1542,7 +1586,7 @@
     <img src="https://cdn.mundopixar.com/media/logo-ja.svg" alt="ピクサーの世界展 ロゴ" onerror="this.style.display='none';">
   </div>
   <h1>MUNDO PIXAR<br>Family Trip!</h1>
-  <div class="subtitle">★ ピクサーの世界展 家族旅行 in 豊洲 ★</div>
+  <div class="subtitle">★ ピクサーの世界展 家族旅行 ★</div>
   <div class="hero-visual">
     <img src="https://prcdn.freetls.fastly.net/release_image/11710/3966/11710-3966-3c1a278eb66ab43282bfda8535ddc112-1080x1081.jpg" alt="ピクサーの世界展 メインビジュアル" onerror="this.style.display='none';">
   </div>
@@ -1582,10 +1626,10 @@
   <!-- 概要 -->
   <section>
     <h2 class="section-title"><span class="badge">★</span>旅のテーマ</h2>
-    <div class="card" style="padding: 24px 28px;">
-      <p style="font-size: 16px; line-height: 1.9;">
-        <strong style="color: var(--woody-red); font-family: 'Bangers', cursive; font-size: 20px; letter-spacing: 1px;">「豊洲グルメ＆アート満喫 メリハリ旅」</strong><br>
-        ピクサー展・チームラボ・千客万来・豊洲市場・ホテルが<strong>すべて徒歩圏内</strong>。観光は豊洲エリアに集中させ、グルメとアート体験を満喫。あとはホテルでゆっくり、メリハリのある最高の3日間。
+    <div class="card" style="padding: 20px 24px;">
+      <p style="font-size: 15px; line-height: 1.8; margin: 0;">
+        <strong style="color: var(--woody-red); font-family: 'Bangers', cursive; font-size: 19px; letter-spacing: 1px;">豊洲グルメ＆アート満喫 メリハリ旅</strong><br>
+        ピクサー展・チームラボ・千客万来・市場・ホテル、すべて<strong>徒歩圏内</strong>で完結。
       </p>
     </div>
   </section>
@@ -1618,51 +1662,31 @@
     </div>
   </section>
 
-  <!-- 移動手段 まるごとガイド -->
+  <!-- 移動手段 -->
   <section>
-    <h2 class="section-title"><span class="badge">🚌</span>移動手段 まるごとガイド</h2>
+    <h2 class="section-title"><span class="badge">🚌</span>移動手段</h2>
     <div class="info-grid">
 
       <div class="info-card recommended">
         <h3>🚌 リムジンバス</h3>
-        <div class="lead">羽田 ⇄ 豊洲駅 直行・途中停車なし。荷物多くても楽。</div>
+        <div class="lead">羽田 ⇄ 豊洲駅 直行</div>
         <div class="row"><span class="key">所要</span><span class="val">20〜30分</span></div>
         <div class="row"><span class="key">料金</span><span class="val">1,000円/人</span></div>
-        <div class="row"><span class="key">6名合計</span><span class="val">6,000円</span></div>
-        <div class="row"><span class="key">乗場</span><span class="val">豊洲駅2番出口前</span></div>
+        <div class="row"><span class="key">乗場</span><span class="val">豊洲駅2番出口</span></div>
         <div style="margin-top:10px;"><a class="btn-link btn-official" href="https://www.limousinebus.co.jp/ja/busstop/detail/ToyosuStation/" target="_blank" rel="noopener">▶ 時刻表</a></div>
       </div>
 
       <div class="info-card">
-        <h3>🚕 GO PREMIUM タクシー</h3>
-        <div class="lead">6人乗りワゴンでドアtoドア。雨・荷物多い時の保険。</div>
+        <h3>🚕 GOタクシー</h3>
+        <div class="lead">6人乗りワゴン</div>
         <div class="row"><span class="key">羽田⇄豊洲</span><span class="val">約7,000〜10,000円</span></div>
-        <div class="row"><span class="key">所要</span><span class="val">約30分</span></div>
-        <div class="row"><span class="key">アプリ</span><span class="val">事前インストール</span></div>
+        <div class="row"><span class="key">用途</span><span class="val">荷物多い時用</span></div>
       </div>
 
       <div class="info-card">
         <h3>🚝 ゆりかもめ</h3>
-        <div class="lead">無人運転・高架で景色◎。子供が喜ぶ。お台場行く時に最適。</div>
+        <div class="lead">お台場行く時用</div>
         <div class="row"><span class="key">豊洲⇄台場</span><span class="val">8分・340円</span></div>
-        <div class="row"><span class="key">豊洲⇄新橋</span><span class="val">22分・390円</span></div>
-        <div class="row"><span class="key">バリアフリー</span><span class="val">エレベーター完備</span></div>
-      </div>
-
-      <div class="info-card">
-        <h3>👟 徒歩</h3>
-        <div class="lead">豊洲エリア内（ホテル⇄ピクサー展⇄千客万来）はすべて徒歩圏。</div>
-        <div class="row"><span class="key">ホテル⇄ピクサー展</span><span class="val">5〜8分</span></div>
-        <div class="row"><span class="key">ホテル⇄千客万来</span><span class="val">3〜5分</span></div>
-        <div class="row"><span class="key">ホテル⇄チームラボ</span><span class="val">8〜10分</span></div>
-      </div>
-
-      <div class="info-card">
-        <h3>🚆 電車（メトロ）</h3>
-        <div class="lead">有楽町線・豊洲駅。階段多い駅もあるのでベビーカー注意。</div>
-        <div class="row"><span class="key">豊洲⇄銀座</span><span class="val">8分・210円</span></div>
-        <div class="row"><span class="key">豊洲⇄東京</span><span class="val">11分・210円</span></div>
-        <div class="row"><span class="key">注意</span><span class="val">乗換多めで赤ちゃん向きでない</span></div>
       </div>
 
     </div>
@@ -1670,7 +1694,7 @@
 
   <!-- ホテル -->
   <section>
-    <h2 class="section-title"><span class="badge">🏨</span>ホテル ／ 第1候補</h2>
+    <h2 class="section-title"><span class="badge">🏨</span>ホテル</h2>
     <div class="card spot">
       <!-- ハム（貯金箱豚）が可愛く座る -->
       <div class="character-on-card" aria-hidden="true">🐷</div>
@@ -1682,10 +1706,10 @@
         <div class="spot-time">2泊・2室・ベビーベッド×2</div>
         <h3 class="spot-name">ラビスタ東京ベイ</h3>
         <p class="spot-desc">
-          ピクサー展・千客万来・チームラボすべて徒歩圏内！最上階14階に天然温泉の眺望大浴場。豊洲市場のお膝元にふさわしい朝食ビュッフェが大評判。共立リゾート系列の名物「夜鳴きそば」（無料）も楽しめる。
+          14階に天然温泉の大浴場。朝食ビュッフェ＆夜鳴きそば（無料）。
         </p>
         <div class="spot-meta">
-          <strong>料金目安</strong>: 2室×2泊 約6〜10万円　／　<strong>申込メモ</strong>: ベビーベッド×2 事前予約必須
+          <strong>料金</strong>: 2室×2泊 約6〜10万円 ／ ベビーベッド事前予約必須
         </div>
         <div class="spot-links">
           <a class="btn-link btn-official" href="https://dormy-hotels.com/resort/hotels/la_tokyobay/" target="_blank" rel="noopener">▶ 公式サイト</a>
@@ -1712,12 +1736,12 @@
       </div>
       <div class="spot-body">
         <div class="spot-time">13:30 〜 15:00</div>
-        <h3 class="spot-name">チームラボプラネッツ TOKYO DMM</h3>
+        <h3 class="spot-name">チームラボプラネッツ</h3>
         <p class="spot-desc">
-          水と光の没入型デジタルアート。SNS映え抜群の幻想空間。広い水盤を裸足で歩く体験は子どもにも一生モノの記憶に。
+          水と光の没入型デジタルアート。裸足で歩く幻想空間。
         </p>
         <div class="spot-meta">
-          ⚠ <strong>抱っこ紐2つ必須</strong>（ベビーカー不可）／ 水エリアあり、<strong>着替え持参推奨</strong>
+          ⚠ 抱っこ紐2つ必須 ／ 着替え持参
         </div>
         <div class="spot-links">
           <a class="btn-link btn-official" href="https://www.teamlab.art/jp/e/planets/" target="_blank" rel="noopener">▶ 公式サイト</a>
@@ -1736,12 +1760,12 @@
       </div>
       <div class="spot-body">
         <div class="spot-time">17:30 〜 19:00</div>
-        <h3 class="spot-name">豊洲 千客万来 ／ 江戸前場下町</h3>
+        <h3 class="spot-name">豊洲 千客万来</h3>
         <p class="spot-desc">
-          江戸の街並みを再現した豊洲市場隣接の食楽施設。寿司・海鮮丼・食べ歩きグルメが集結。<strong>まるり鮨</strong>のマグロ寿司、<strong>相馬水産のマグロ串</strong>、<strong>越後屋助五郎の魚介串</strong>が名物。平日なので混雑控えめ。
+          江戸風の食楽施設。寿司・海鮮丼・食べ歩き。
         </p>
         <div class="spot-meta">
-          ⚠ 通路狭め、<strong>抱っこ紐推奨</strong>（ベビーカーは不向き）
+          ⚠ 通路狭め・抱っこ紐推奨
         </div>
         <div class="spot-links">
           <a class="btn-link btn-official" href="https://www.toyosu-senkyakubanrai.jp/" target="_blank" rel="noopener">▶ 公式サイト</a>
@@ -1760,12 +1784,12 @@
       </div>
       <div class="spot-body">
         <div class="spot-time">19:00 〜 20:00</div>
-        <h3 class="spot-name">千客万来 8F 足湯庭園</h3>
+        <h3 class="spot-name">8F 足湯庭園</h3>
         <p class="spot-desc">
-          豊洲の海と東京の夜景を一望しながらの足湯。<strong>無料</strong>で利用できる絶景スポット。夕暮れ〜夜景の時間帯がベスト。
+          東京湾の夜景を見ながら足湯（無料）。
         </p>
         <div class="spot-meta">
-          🧴 <strong>足ふきタオル持参推奨</strong>（販売もあり）
+          🧴 足ふきタオル持参
         </div>
         <div class="spot-links">
           <a class="btn-link btn-official" href="https://www.toyosu-senkyakubanrai.jp/" target="_blank" rel="noopener">▶ 公式サイト</a>
@@ -1779,7 +1803,7 @@
   <section>
     <div class="day-header">
       <h2>★ Day 2 ／ 7月15日 (水)</h2>
-      <span class="day-tag">★ メインイベント・ピクサー展 ★</span>
+      <span class="day-tag">★ ピクサー展 ★</span>
     </div>
 
     <!-- 豊洲市場 -->
@@ -1791,12 +1815,12 @@
       </div>
       <div class="spot-body">
         <div class="spot-time">10:30 〜 12:00</div>
-        <h3 class="spot-name">豊洲市場 場内飲食店街</h3>
+        <h3 class="spot-name">豊洲市場 場内飲食店</h3>
         <p class="spot-desc">
-          ホテルから徒歩圏。39店舗の老舗が集結する寿司ブランチの聖地。<strong>大和寿司・寿司大・大江戸（海鮮丼）</strong>などの名店が朝6時から開店。<strong>14〜15時閉店</strong>の店が多いので午前中に！
+          39店舗の名店が集結。大和寿司・寿司大・大江戸など。
         </p>
         <div class="spot-meta">
-          ⚠ <strong>2026/7/15(水)の開市状況は出発前に公式PDFカレンダーで要確認</strong>（年に数回水曜休市あり、月によって変動）／ 休市時は千客万来 or ホテル朝食で代替
+          ⚠ 14時頃閉店なので午前中に ／ 7/15(水)の開市状況は出発前に要確認
         </div>
         <div class="spot-links">
           <a class="btn-link btn-official" href="https://www.toyosu-market.or.jp/calendar/" target="_blank" rel="noopener">▶ 休市日カレンダー</a>
@@ -1840,13 +1864,13 @@
         <div class="spot-time" style="background: var(--buzz-purple); box-shadow: 0 3px 0 #3A1A5C;">14:00 〜 16:00</div>
         <h3 class="spot-name" style="color: var(--buzz-purple);">★ ピクサーの世界展 ★</h3>
         <p class="spot-desc">
-          10作品の映画世界に実物大で入り込む没入体験！24体以上の等身大キャラクターと記念撮影できる夢のような展示。会場「CREVIA BASE Tokyo」は市場前駅すぐ・徒歩圏内。
+          10作品の映画世界に没入体験。等身大キャラ24体と記念撮影。
         </p>
         <div class="spot-meta">
-          ⚠ <strong>13:45集合（15分前ルール）</strong> ／ 抱っこ紐2つ必須（ベビーカー不可）／ 鈴花・大樹は無料（3歳以下）／ 入る前に<strong>トイレ必須</strong>（途中退出不可）
+          ⚠ <strong>13:45集合</strong> ／ 抱っこ紐2つ必須 ／ 鈴花・大樹は無料（3歳以下）／ 入る前にトイレ必須
         </div>
-        <div style="margin: 12px 0; padding: 12px; background: #F4E8FF; border-radius: 8px; border-left: 4px solid var(--buzz-purple); font-size: 13px;">
-          <strong style="color: var(--buzz-purple);">🛍 グッズ売り場</strong>: 限定約500種類！詰め合わせ缶、限定Tシャツ、オリジナルラベル缶（全10種）が人気
+        <div style="margin: 12px 0; padding: 10px 12px; background: #F4E8FF; border-radius: 8px; border-left: 4px solid var(--buzz-purple); font-size: 13px;">
+          🛍 限定グッズ約500種類
         </div>
         <div class="spot-links">
           <a class="btn-link btn-official" href="https://mundopixar.jp/" target="_blank" rel="noopener">▶ 公式サイト</a>
@@ -1863,13 +1887,13 @@
         <span class="photo-label">★ DINNER ★</span>
       </div>
       <div class="spot-body">
-        <div class="spot-time">18:30〜 ／ 当日決定</div>
-        <h3 class="spot-name">夕食 ／ その場で相談</h3>
+        <div class="spot-time">18:30〜 当日決定</div>
+        <h3 class="spot-name">夕食</h3>
         <p class="spot-desc">
-          メンバーの体調・気分・赤ちゃんのコンディションを見て、当日決める。豊洲駅周辺・ららぽーと豊洲・千客万来・ホテル内「季の庭」など選択肢豊富。
+          みんなの体調を見てその場で決める。
         </p>
         <div class="spot-meta">
-          💡 <strong>候補例</strong>: 五臓六腑（焼肉・座敷個室）／ 豊洲漁場直送 海鮮居酒屋 ／ ホテル「季の庭」（和食会席・館内）
+          💡 候補: 五臓六腑（焼肉）／ 海鮮居酒屋 ／ ホテル「季の庭」
         </div>
       </div>
     </div>
@@ -1883,9 +1907,9 @@
     </div>
 
     <!-- ▶▶▶ プラン A: 千客万来 ◀◀◀ -->
-    <h3 class="plan-title"><span class="plan-letter">A</span>のんびりプラン ／ 千客万来もう一度</h3>
+    <h3 class="plan-title"><span class="plan-letter">A</span>のんびり：千客万来</h3>
     <div class="plan-desc">
-      豊洲エリアでゆっくり、最後まで満喫コース。徒歩で完結、移動ストレスなし。<strong>赤ちゃん連れ・暑さ回避を優先するならコチラ</strong>。
+      豊洲で最後までゆっくり。徒歩で完結。
     </div>
 
     <!-- 千客万来 食べ歩き -->
@@ -1897,13 +1921,10 @@
       </div>
       <div class="spot-body">
         <div class="spot-time">10:30 〜 12:30</div>
-        <h3 class="spot-name">千客万来 食べ歩き＆お土産</h3>
+        <h3 class="spot-name">食べ歩き＆お土産</h3>
         <p class="spot-desc">
-          Day1で食べきれなかったグルメを攻略。1Fラーメン店5店舗、おでん、和スイーツも充実。お土産もここで購入完結。徒歩で完結するのでベビーカー・抱っこ紐の負担も少ない。
+          1Fラーメン横丁、和スイーツ、お土産。
         </p>
-        <div class="spot-meta">
-          🍜 <strong>1Fラーメン横丁</strong>: 名店5店舗が集結 ／ 🍡 和スイーツ・おでん横丁あり ／ 🎁 お土産屋多数
-        </div>
         <div class="spot-links">
           <a class="btn-link btn-official" href="https://www.toyosu-senkyakubanrai.jp/" target="_blank" rel="noopener">▶ 公式サイト</a>
           <a class="btn-link btn-map" href="https://www.google.com/maps/search/?api=1&query=%E8%B1%8A%E6%B4%B2%E5%8D%83%E5%AE%A2%E4%B8%87%E6%9D%A5" target="_blank" rel="noopener">📍 Googleマップ</a>
@@ -1917,9 +1938,9 @@
     </div>
 
     <!-- ▶▶▶ プラン B: お台場 ◀◀◀ -->
-    <h3 class="plan-title"><span class="plan-letter b">B</span>お台場 サブプラン ／ ガンダム＆動物</h3>
+    <h3 class="plan-title"><span class="plan-letter b">B</span>お台場：ガンダム＆動物</h3>
     <div class="plan-desc">
-      豊洲駅から<strong>ゆりかもめで一駅（約8分）</strong>。屋内施設中心で猛暑回避。子供にも喜んでもらえるラインナップ。<strong>体力に余裕があり「もう一段冒険したい」場合はコチラ</strong>。
+      豊洲から ゆりかもめで一駅（8分）。
     </div>
 
     <!-- ユニコーンガンダム -->
@@ -1931,13 +1952,12 @@
       </div>
       <div class="spot-body">
         <div class="spot-time">10:00 〜 11:00</div>
-        <h3 class="spot-name">実物大 ユニコーンガンダム立像</h3>
+        <h3 class="spot-name">ユニコーンガンダム立像</h3>
         <p class="spot-desc">
-          ダイバーシティ東京プラザ前。<strong>全高19.7m・重量49t</strong>の超大迫力。屋外なので猛暑日は要注意だが、変身ショーは一見の価値あり。男の子（大樹くん将来用）の写真撮影スポットとしても最高。
+          全高19.7mの大迫力。変身ショーあり（無料）。
         </p>
         <div class="spot-meta">
-          🎬 <strong>変身ショー</strong>: 11:00 / 13:00 / 15:00 / 17:00（昼）／ 19:00〜21:30 30分毎（夜）<br>
-          ⏱ <strong>滞在目安</strong>: 30分（変身ショー含めて）／ <strong>無料</strong>
+          🎬 ショー: 11:00 / 13:00 / 15:00 / 17:00 ／ 滞在目安30分
         </div>
         <div class="spot-links">
           <a class="btn-link btn-official" href="https://mitsui-shopping-park.com/divercity-tokyo/" target="_blank" rel="noopener">▶ 公式</a>
@@ -1956,13 +1976,12 @@
       </div>
       <div class="spot-body">
         <div class="spot-time">11:00 〜 12:00</div>
-        <h3 class="spot-name">アニタッチ アクアシティお台場</h3>
+        <h3 class="spot-name">アニタッチ</h3>
         <p class="spot-desc">
-          屋内型ふれあい動物園。伊豆シャボテン動物公園プロデュース。<strong>モルモット・ウサギ・ハリネズミ・カピバラ・カメレオン・ヘビ</strong>などにゼロ距離で触れ合える。鈴花ちゃんも喜びそう。アクアシティお台場3F。
+          屋内ふれあい動物園。ハリネズミ・ウサギ・モルモットなど。
         </p>
         <div class="spot-meta">
-          ⏰ <strong>営業</strong>: 平日11:00〜19:00／土日祝11:00〜21:00<br>
-          💴 <strong>料金</strong>: 平日 大人1,500円・小人800円（4歳〜小学生）／ 土日祝 大人1,800円
+          💴 平日 大人1,500円 ／ ⏰ 11:00〜19:00
         </div>
         <div class="spot-links">
           <a class="btn-link btn-official" href="https://www.odaiba.anitouch.com/" target="_blank" rel="noopener">▶ 公式サイト</a>
@@ -1980,13 +1999,13 @@
         <span class="photo-label">★ VIEW ★</span>
       </div>
       <div class="spot-body">
-        <div class="spot-time">12:00 〜 13:00 ／ ランチ＆絶景</div>
+        <div class="spot-time">12:00 〜 13:00 ランチ</div>
         <h3 class="spot-name">アクアシティお台場</h3>
         <p class="spot-desc">
-          目の前に広がる<strong>レインボーブリッジと自由の女神像</strong>。3F「女神のテラス」は東京一の絶景フォト映えスポット。屋上7Fの「お台場神社」からは東京タワーまで一望。<strong>東京ラーメン国技館</strong>（人気店6店集結）でランチ、<strong>キッズメニュー充実・授乳室・ベビーカー貸出完備</strong>。
+          レインボーブリッジ＆自由の女神を望む大型商業施設。
         </p>
         <div class="spot-meta">
-          🌅 女神のテラス（3F）→ レインボーブリッジ＋自由の女神 ／ 🏯 お台場神社（屋上7F）→ 東京タワー眺望 ／ 🍜 東京ラーメン国技館
+          🌅 女神のテラス（3F）／ 🍜 東京ラーメン国技館
         </div>
         <div class="spot-links">
           <a class="btn-link btn-official" href="https://www.aquacity.jp/" target="_blank" rel="noopener">▶ 公式サイト</a>
@@ -2004,12 +2023,12 @@
       </div>
       <div class="spot-body">
         <div class="spot-time">代替オプション</div>
-        <h3 class="spot-name">レゴランド・ディスカバリー・センター東京</h3>
+        <h3 class="spot-name">レゴランド東京</h3>
         <p class="spot-desc">
-          デックス東京ビーチ内の屋内型レゴ施設。約167万個のブロックで作った東京ジオラマ、4Dシネマ、レゴ教室、<strong>1〜2歳向けの「デュプロ®ビレッジ」</strong>あり。<strong>3歳未満は無料</strong>なので鈴花・大樹はタダ。
+          167万個のブロックで作った東京ジオラマ。3歳未満は無料。
         </p>
         <div class="spot-meta">
-          ⚠ <strong>0歳・1歳には少し早め</strong>。デュプロビレッジで遊ばせる程度ならOK。中学生以上の同行者がいれば最大限楽しめる。
+          ⚠ 0〜1歳には少し早め
         </div>
         <div class="spot-links">
           <a class="btn-link btn-official" href="https://www.legolanddiscoverycenter.com/tokyo/" target="_blank" rel="noopener">▶ 公式サイト</a>
@@ -2018,36 +2037,30 @@
       </div>
     </div>
 
-    <!-- お台場周辺施設まとめ -->
-    <div class="card" style="padding: 22px 28px; background: #FFEFC9; border-color: var(--buzz-purple);">
-      <h3 style="font-family: 'Bangers', cursive; color: var(--buzz-purple); font-size: 22px; margin-bottom: 12px; letter-spacing: 1.5px;">★ お台場 周辺で他に何があるか ★</h3>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; font-size: 13px;">
-        <div><strong style="color: var(--woody-red);">🏬 ダイバーシティ東京プラザ</strong><br>ガンダムの足元。フードコート＆ショッピング</div>
-        <div><strong style="color: var(--woody-red);">💩 うんこミュージアム</strong><br>ダイバーシティ2F。ポップで写真映え</div>
-        <div><strong style="color: var(--woody-red);">🎢 東京ジョイポリス</strong><br>デックス東京ビーチ。屋内テーマパーク</div>
-        <div><strong style="color: var(--woody-red);">🐠 アクアパーク・スクエア</strong><br>アクアシティ5F。タッチプールあり都市型水族館</div>
-        <div><strong style="color: var(--woody-red);">📺 フジテレビ本社</strong><br>球体展望室から東京湾一望</div>
-        <div><strong style="color: var(--woody-red);">🌊 お台場海浜公園</strong><br>レインボーブリッジ眺望（屋外、夏は熱中症注意）</div>
+    <!-- お台場 他のスポット -->
+    <div class="card" style="padding: 18px 22px; background: #FFEFC9; border-color: var(--buzz-purple);">
+      <h3 style="font-family: 'Bangers', cursive; color: var(--buzz-purple); font-size: 20px; margin-bottom: 10px; letter-spacing: 1.5px;">★ お台場 その他 ★</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; font-size: 13px;">
+        <div><strong>💩 うんこミュージアム</strong></div>
+        <div><strong>🎢 ジョイポリス</strong></div>
+        <div><strong>🐠 アクアパーク水族館</strong></div>
+        <div><strong>📺 フジテレビ展望台</strong></div>
       </div>
     </div>
 
     <!-- 帰路（共通） -->
-    <h3 class="plan-title" style="color: var(--paper);"><span class="plan-letter" style="background: var(--andy-sky-deep); color: var(--paper);">✈</span>帰路 ／ 共通</h3>
+    <h3 class="plan-title" style="color: var(--paper);"><span class="plan-letter" style="background: var(--andy-sky-deep); color: var(--paper);">✈</span>帰路</h3>
     <div class="card spot">
       <div class="spot-photo" style="background: linear-gradient(135deg, #2E7FB8 0%, #5BB4E8 100%);">
         <div class="icon">✈</div>
         <span class="photo-label">★ FLY HOME ★</span>
       </div>
       <div class="spot-body">
-        <div class="spot-time">13:00 〜 17:30</div>
-        <h3 class="spot-name">羽田空港 → 福岡空港</h3>
+        <div class="spot-time">13:00 → 17:30 福岡着</div>
+        <h3 class="spot-name">羽田 → 福岡</h3>
         <p class="spot-desc">
-          13:00 <strong>豊洲駅からリムジンバスで羽田直行</strong>（または GO PREMIUM タクシー）→ 13:30〜13:45 到着、ANAラウンジでひと休み（プラチナ特典）→ 15:25 ANA257発 → 17:30頃 福岡着。優先搭乗で赤ちゃん連れも余裕。
+          13:00 リムジンバスで羽田 → ANAラウンジで休憩 → 15:25 ANA257発。
         </p>
-        <div class="spot-links">
-          <a class="btn-link btn-official" href="https://tokyo-haneda.com/" target="_blank" rel="noopener">▶ 羽田空港</a>
-          <a class="btn-link btn-map" href="https://www.google.com/maps/search/?api=1&query=%E7%BE%BD%E7%94%B0%E7%A9%BA%E6%B8%AF" target="_blank" rel="noopener">📍 Googleマップ</a>
-        </div>
       </div>
     </div>
   </section>
@@ -2057,13 +2070,12 @@
     <h2 class="section-title"><span class="badge">📋</span>準備リスト</h2>
     <div class="card" style="padding: 24px 28px;">
       <ul class="note-list">
-        <li><strong>抱っこ紐 × 2</strong>（チームラボ・ピクサー展・千客万来すべてで必須）</li>
-        <li><strong>足湯用タオル</strong>（千客万来 8F足湯庭園で使用）</li>
-        <li><strong>チームラボ用の着替え</strong>（水エリアあり、子供は確実に濡れる）</li>
-        <li><strong>GO PREMIUMアプリ</strong>を事前インストール＆登録（6人乗りワゴン配車）</li>
-        <li><strong>ベビーベッド × 2</strong> をホテル予約時に申し込み</li>
-        <li>出発前に <strong>豊洲市場 7/15(水)の営業確認</strong>（水曜休市の可能性）</li>
-        <li>出発前に <strong>千客万来の店舗別営業時間</strong> を確認</li>
+        <li><strong>抱っこ紐 × 2</strong></li>
+        <li>足湯用タオル</li>
+        <li>チームラボ用の着替え（濡れる）</li>
+        <li>GOアプリ事前インストール</li>
+        <li>ベビーベッド×2 をホテルに事前予約</li>
+        <li>豊洲市場 7/15(水) の営業確認</li>
       </ul>
     </div>
   </section>
