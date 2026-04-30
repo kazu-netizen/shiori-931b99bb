@@ -1440,12 +1440,12 @@
     <h2 class="welcome-title">★ Welcome, Partner! ★</h2>
     <p class="welcome-sub">ピクサーの世界展<br>家族旅行のしおり</p>
     <button id="welcome-start" onclick="startJourney()">
-      ♪ "君はともだち" を流す
+      ♪ "君はともだち" 日本語版を流す
     </button>
     <button id="welcome-skip" onclick="startJourney(true)">
       Skip Music
     </button>
-    <p class="welcome-note" id="welcome-note-msg">Spotifyで "君はともだち" を再生（広告なし）<br><small style="opacity:0.7;">※Premium加入なら全曲、無料アカウントは30秒プレビュー</small></p>
+    <p class="welcome-note" id="welcome-note-msg">Diamond Yukai 日本語版（広告なし）<br><small style="opacity:0.7;">※Spotifyログイン済 → 自動再生／未ログイン → プレーヤーの▶をタップ</small></p>
   </div>
 </div>
 
@@ -2018,7 +2018,7 @@
       loading="lazy">
     </iframe>
     <div class="music-track-toggle" role="tablist">
-      <button type="button" data-track="friend" class="active" onclick="switchTrack('friend')">🤠 ともだち</button>
+      <button type="button" data-track="friend" class="active" onclick="switchTrack('friend')">🤠 君はともだち</button>
       <button type="button" data-track="remember" onclick="switchTrack('remember')">💀 リメンバー</button>
       <button type="button" data-track="married" onclick="switchTrack('married')">🎈 UP</button>
     </div>
@@ -2030,12 +2030,12 @@
 </div>
 
 <script>
-// Spotify トラックID（広告なし・30秒プレビュー or フル再生）
+// Spotify トラックID（日本語版を最初に・フォールバック用）
 const SPOTIFY_TRACK_IDS = [
-  '2stkLJ0JNcXkIRDNF3ld6c', // Original Randy Newman
-  '2ql6uQjnua3N17mF95J7YZ', // Disney/Pixar Toy Story
-  '0tFlZBBAQFBwAHKpTOOv2Y', // Duet with Lyle Lovett
-  '6Y8IUkTCEOCqFhvO25Hlj8'  // Soundtrack version
+  '2wkuVfVBB8RlTNWiXApcSL', // 君はともだち 日本語版（Diamond Yukai - TS4）★Default
+  '0sCp9N9jwlQbImcxIf01yW', // 君はともだち（HIRAIDAI）日本人カバー
+  '2yXLB4rNiY3hpOLtnVpBiz', // 君はともだち（Randy Newman 日本版）
+  '2stkLJ0JNcXkIRDNF3ld6c'  // Original英語版（最終フォールバック）
 ];
 let currentVideoIndex = 0;
 
@@ -2098,7 +2098,7 @@ function tryNextVideo() {
 
 // === 🎵 楽曲切替（全てピクサー公式作品） ===
 const TRACK_LIBRARY = {
-  friend: { id: '2stkLJ0JNcXkIRDNF3ld6c', name: '君はともだち' },
+  friend: { id: '2wkuVfVBB8RlTNWiXApcSL', name: '君はともだち（日本語版・Diamond Yukai）' },
   remember: { id: '0UUBEcwtRgxdqhJTAW7y4C', name: 'リメンバーミー (Coco)' },
   married: { id: '5IUCgTMWowgdNFi5xGEKhZ', name: 'Married Life (Up)' }
 };
