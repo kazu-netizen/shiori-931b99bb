@@ -370,10 +370,27 @@
     to { transform: rotate(360deg); }
   }
 
-  /* レスポンシブ: スマホでは一部キャラを隠す */
+  /* レスポンシブ: スマホ用にキャラサイズを縮小（非表示にしない） */
   @media (max-width: 600px) {
-    .character-buzz, .character-cars { display: none; }
-    .character-aliens span { font-size: 28px; }
+    .character-buzz {
+      width: 75px;
+      height: 115px;
+      top: 8%;
+      right: -90px;
+    }
+    .character-cars {
+      width: 90px;
+      height: 130px;
+      bottom: 60px;
+      left: -110px;
+    }
+    .character-aliens span,
+    .character-aliens img {
+      font-size: 26px;
+      width: 36px;
+    }
+    .character-aliens { bottom: 16px; left: 12px; }
+    .alien-speech { font-size: 11px; padding: 3px 9px; top: -26px; }
   }
 
   /* === 🎈 Up（カールじいさんの家）の風船 === */
