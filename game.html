@@ -458,6 +458,32 @@
   }
   .return:hover { background: rgba(42, 24, 16, 0.75); }
 
+  /* ===== Mute button ===== */
+  #btn-mute {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 3px solid var(--woody-brown);
+    background: var(--paper);
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 7;
+    box-shadow: 0 3px 0 var(--woody-brown), 0 6px 12px var(--shadow);
+    line-height: 1;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+  #btn-mute:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 var(--woody-brown), 0 3px 6px var(--shadow);
+  }
+
   @media (max-width: 480px) {
     #hud { padding: 8px; gap: 6px; }
     .hud-block { padding: 6px 10px; min-width: 78px; }
@@ -570,6 +596,8 @@
     </div>
   </div>
 
+  <button id="btn-mute" type="button" aria-label="サウンド切り替え" title="サウンド ON/OFF">🔊</button>
+
   <a class="return" href="しおり.html">← しおりに戻る</a>
 </div>
 
@@ -606,41 +634,181 @@
   resize();
   window.addEventListener('resize', resize);
 
+  // ===== Audio engine (Web Audio API, no external files) =====
+  const Audio = (() => {
+    let actx = null, master = null, muted = false, bgmActive = false, bgmStop = false;
+    function init() {
+      if (actx) return;
+      try {
+        actx = new (window.AudioContext || window.webkitAudioContext)();
+        master = actx.createGain();
+        master.gain.value = muted ? 0 : 0.4;
+        master.connect(actx.destination);
+      } catch (e) { /* audio unavailable */ }
+    }
+    function resume() {
+      if (actx && actx.state === 'suspended') actx.resume();
+    }
+    function tone(freq, dur, type = 'sine', vol = 0.3, when = 0, slideTo = null) {
+      if (!actx || muted) return;
+      const t = actx.currentTime + when;
+      const osc = actx.createOscillator();
+      const g = actx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, t);
+      if (slideTo) osc.frequency.exponentialRampToValueAtTime(Math.max(20, slideTo), t + dur);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol, t + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      osc.connect(g); g.connect(master);
+      osc.start(t); osc.stop(t + dur + 0.05);
+    }
+    function ding(value) {
+      const f = Math.min(2200, 480 + value * 3);
+      tone(f, 0.12, 'triangle', 0.32);
+      tone(f * 1.5, 0.10, 'sine', 0.18, 0.015);
+    }
+    function bullseye() {
+      [880, 1320, 1760, 2200].forEach((f, i) => tone(f, 0.18, 'triangle', 0.30, i * 0.05));
+      tone(1760, 0.4, 'sine', 0.18, 0.20);
+    }
+    function fanfare() {
+      [659, 784, 988, 1319, 1568, 1976, 2349, 3136].forEach((f, i) =>
+        tone(f, 0.20, 'square', 0.22, i * 0.06)
+      );
+      for (let i = 0; i < 10; i++) {
+        tone(2000 + Math.random() * 1500, 0.06, 'sine', 0.15, 0.55 + i * 0.04);
+      }
+    }
+    function buzz() {
+      if (!actx || muted) return;
+      const t = actx.currentTime;
+      const osc = actx.createOscillator();
+      const g = actx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, t);
+      osc.frequency.exponentialRampToValueAtTime(70, t + 0.45);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.32, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+      osc.connect(g); g.connect(master);
+      osc.start(t); osc.stop(t + 0.5);
+      tone(160, 0.14, 'square', 0.22, 0.08);
+    }
+    function miss() { tone(170, 0.06, 'sine', 0.10); }
+    function comboTick(level) { tone(660 + level * 70, 0.06, 'square', 0.16); }
+    function roundStart() { [523, 659, 784].forEach((f, i) => tone(f, 0.16, 'triangle', 0.25, i * 0.07)); }
+    function gameOverJingle() { [880, 698, 587, 440].forEach((f, i) => tone(f, 0.22, 'triangle', 0.25, i * 0.10)); }
+
+    // Cheerful 8-bit BGM, looping
+    function startBGM() {
+      if (!actx || bgmActive) return;
+      bgmActive = true; bgmStop = false;
+      const tempo = 132, beat = 60 / tempo;
+      // C major upbeat melody
+      const melody = [
+        [523, 0.5], [659, 0.5], [784, 0.5], [659, 0.5],
+        [1047, 1.0], [880, 0.5], [784, 0.5],
+        [698, 0.5], [880, 0.5], [1047, 0.5], [880, 0.5],
+        [784, 1.0], [659, 0.5], [523, 0.5],
+        [587, 0.5], [698, 0.5], [880, 0.5], [698, 0.5],
+        [1047, 1.0], [988, 0.5], [880, 0.5],
+        [784, 0.5], [988, 0.5], [1175, 0.5], [988, 0.5],
+        [880, 2.0],
+      ];
+      const bass = [
+        [131, 1], [196, 1], [165, 1], [196, 1],
+        [175, 1], [220, 1], [196, 1], [262, 1],
+        [147, 1], [196, 1], [165, 1], [196, 1],
+        [175, 1], [196, 1], [220, 2],
+      ];
+      const loopDur = melody.reduce((s, n) => s + n[1] * beat, 0);
+      function scheduleLoop(startT) {
+        if (bgmStop || !actx) { bgmActive = false; return; }
+        let t = startT;
+        for (const [f, b] of melody) {
+          const dur = b * beat;
+          const osc = actx.createOscillator();
+          const g = actx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(f, t);
+          g.gain.setValueAtTime(0, t);
+          g.gain.linearRampToValueAtTime(0.045, t + 0.005);
+          g.gain.linearRampToValueAtTime(0.03, t + dur * 0.7);
+          g.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.95);
+          osc.connect(g); g.connect(master);
+          osc.start(t); osc.stop(t + dur);
+          t += dur;
+        }
+        let tb = startT;
+        for (const [f, b] of bass) {
+          const dur = b * beat;
+          const osc = actx.createOscillator();
+          const g = actx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(f, tb);
+          g.gain.setValueAtTime(0, tb);
+          g.gain.linearRampToValueAtTime(0.06, tb + 0.01);
+          g.gain.exponentialRampToValueAtTime(0.001, tb + dur * 0.9);
+          osc.connect(g); g.connect(master);
+          osc.start(tb); osc.stop(tb + dur);
+          tb += dur;
+        }
+        const nextStart = startT + loopDur;
+        const wait = (nextStart - actx.currentTime - 0.3) * 1000;
+        setTimeout(() => scheduleLoop(nextStart), Math.max(0, wait));
+      }
+      scheduleLoop(actx.currentTime + 0.05);
+    }
+    function stopBGM() { bgmStop = true; bgmActive = false; }
+    function setMute(m) {
+      muted = m;
+      if (master) master.gain.setValueAtTime(muted ? 0 : 0.4, actx.currentTime);
+    }
+    return { init, resume, ding, bullseye, fanfare, buzz, miss, comboTick, roundStart, gameOverJingle, startBGM, stopBGM, setMute, isMuted: () => muted };
+  })();
+
   // ===== Round configs =====
   const ROUNDS = [
     {
-      num: 1, name: 'Hamm & Eggs', tip: '動物にタマゴを当てよう！',
-      bg: 'farm', spawnEvery: 0.55, duration: 25,
+      num: 1, name: 'Hamm & Eggs', tip: '動物に命中！ 👦キッズは撃つな！',
+      bg: 'farm', spawnEvery: 0.42, duration: 25,
       types: [
-        { kind: 'pig',   color: '#F49AC1', size: 56, value: 50, speed: 130, weight: 4, emoji: '🐷' },
-        { kind: 'cow',   color: '#FFFFFF', size: 70, value: 100, speed: 100, weight: 3, emoji: '🐄' },
-        { kind: 'sheep', color: '#F4F4F0', size: 50, value: 10, speed: 170, weight: 5, emoji: '🐑' },
-        { kind: 'chick', color: '#FFC72C', size: 36, value: 100, speed: 220, weight: 2, emoji: '🐤' },
+        { kind: 'pig',   color: '#F49AC1', size: 46, value: 50, speed: 165, weight: 4, emoji: '🐷' },
+        { kind: 'cow',   color: '#FFFFFF', size: 58, value: 100, speed: 130, weight: 3, emoji: '🐄' },
+        { kind: 'sheep', color: '#F4F4F0', size: 42, value: 30, speed: 215, weight: 5, emoji: '🐑' },
+        { kind: 'chick', color: '#FFC72C', size: 30, value: 150, speed: 280, weight: 2, emoji: '🐤' },
+        { kind: 'kid',   color: '#5BB4E8', size: 50, value: -300, speed: 110, weight: 1.4, emoji: '👦', penalty: true },
+        { kind: 's_lamp', color: '#FFE066', size: 30, value: 5000, speed: 230, weight: 0.06, emoji: '💡', secret: true },
       ],
       pattern: 'walk',
       shooter: 'egg'
     },
     {
-      num: 2, name: 'Alien Balloons', tip: 'バルーンとリトル・グリーンメンを撃て！',
-      bg: 'space', spawnEvery: 0.5, duration: 25,
+      num: 2, name: 'Alien Balloons', tip: 'バルーン＆エイリアン！ 👨‍🚀宇宙飛行士は撃つな！',
+      bg: 'space', spawnEvery: 0.4, duration: 25,
       types: [
-        { kind: 'balloon-r', color: '#C8102E', size: 50, value: 10, speed: 100, weight: 4, emoji: '🎈' },
-        { kind: 'balloon-y', color: '#FFC72C', size: 50, value: 10, speed: 110, weight: 4, emoji: '🎈' },
-        { kind: 'balloon-g', color: '#1B7F3A', size: 50, value: 10, speed: 120, weight: 4, emoji: '🎈' },
-        { kind: 'alien',    color: '#7CC576', size: 60, value: 100, speed: 150, weight: 3, emoji: '👽' },
-        { kind: 'rocket',   color: '#5B2D8C', size: 70, value: 50, speed: 240, weight: 2, emoji: '🚀' },
+        { kind: 'balloon-r', color: '#C8102E', size: 42, value: 10, speed: 130, weight: 4, emoji: '🎈' },
+        { kind: 'balloon-y', color: '#FFC72C', size: 42, value: 10, speed: 140, weight: 4, emoji: '🎈' },
+        { kind: 'balloon-g', color: '#1B7F3A', size: 42, value: 10, speed: 150, weight: 4, emoji: '🎈' },
+        { kind: 'alien',    color: '#7CC576', size: 50, value: 120, speed: 195, weight: 3, emoji: '👽' },
+        { kind: 'rocket',   color: '#5B2D8C', size: 56, value: 80, speed: 310, weight: 2, emoji: '🚀' },
+        { kind: 'astro',    color: '#5BB4E8', size: 50, value: -400, speed: 170, weight: 1.5, emoji: '👨‍🚀', penalty: true },
+        { kind: 's_ufo',    color: '#5B2D8C', size: 36, value: 4000, speed: 290, weight: 0.07, emoji: '🛸', secret: true },
       ],
       pattern: 'rise',
       shooter: 'dart'
     },
     {
-      num: 3, name: "Woody's Gallery", tip: '西部の的を撃ち抜け！ボーナスを狙え！',
-      bg: 'west', spawnEvery: 0.45, duration: 25,
+      num: 3, name: "Woody's Gallery", tip: '西部の的を撃ち抜け！ 🐴ウマは撃つな！',
+      bg: 'west', spawnEvery: 0.36, duration: 25,
       types: [
-        { kind: 'bottle', color: '#1B7F3A', size: 46, value: 10, speed: 0, weight: 5, emoji: '🍾' },
-        { kind: 'can',    color: '#C8102E', size: 50, value: 50, speed: 0, weight: 4, emoji: '🥫' },
-        { kind: 'hat',    color: '#6B3410', size: 60, value: 100, speed: 0, weight: 3, emoji: '🤠' },
-        { kind: 'star',   color: '#FFC72C', size: 56, value: 200, speed: 0, weight: 2, emoji: '⭐' },
+        { kind: 'bottle', color: '#1B7F3A', size: 38, value: 30, speed: 0, weight: 5, emoji: '🍾' },
+        { kind: 'can',    color: '#C8102E', size: 42, value: 80, speed: 0, weight: 4, emoji: '🥫' },
+        { kind: 'hat',    color: '#6B3410', size: 50, value: 150, speed: 0, weight: 3, emoji: '🤠' },
+        { kind: 'star',   color: '#FFC72C', size: 46, value: 250, speed: 0, weight: 2, emoji: '⭐' },
+        { kind: 'horse',  color: '#8B4513', size: 56, value: -500, speed: 0, weight: 1.4, emoji: '🐴', penalty: true },
+        { kind: 's_gem',  color: '#5B2D8C', size: 30, value: 6000, speed: 0, weight: 0.05, emoji: '💎', secret: true },
       ],
       pattern: 'popup',
       shooter: 'cork'
@@ -934,37 +1102,65 @@
     ctx.save();
     ctx.translate(t.x, t.y);
     ctx.scale(a, a);
-    if (t.hitFlash > 0) {
+
+    // Special glow for secret targets
+    if (t.type.secret) {
+      ctx.shadowColor = `hsl(${(performance.now() / 6) % 360}, 95%, 60%)`;
+      ctx.shadowBlur = 22 + Math.sin(performance.now() / 130) * 8;
+    } else if (t.hitFlash > 0) {
       ctx.shadowColor = '#FFC72C';
       ctx.shadowBlur = 30;
     }
+
     // backing disc
     ctx.beginPath();
     ctx.fillStyle = t.type.color;
     ctx.arc(0, 0, t.size / 2, 0, Math.PI * 2);
     ctx.fill();
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = '#6B3410';
+    ctx.lineWidth = t.type.penalty ? 5 : 4;
+    ctx.strokeStyle = t.type.penalty ? '#C8102E' : (t.type.secret ? '#FFD700' : '#6B3410');
     ctx.stroke();
-    // bullseye ring
-    ctx.beginPath();
-    ctx.fillStyle = '#FFF8E7';
-    ctx.arc(0, 0, t.size / 3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.fillStyle = '#C8102E';
-    ctx.arc(0, 0, t.size / 6, 0, Math.PI * 2);
-    ctx.fill();
+
+    // bullseye ring (skip for special targets to make them visually distinct)
+    if (!t.type.penalty && !t.type.secret) {
+      ctx.beginPath();
+      ctx.fillStyle = '#FFF8E7';
+      ctx.arc(0, 0, t.size / 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.fillStyle = '#C8102E';
+      ctx.arc(0, 0, t.size / 6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
     // emoji label
     ctx.shadowBlur = 0;
-    ctx.font = `${Math.floor(t.size * 0.55)}px 'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif`;
+    const emojiCenter = (t.type.penalty || t.type.secret) ? 0 : t.size * 0.42;
+    const emojiSize = Math.floor(t.size * (t.type.penalty || t.type.secret ? 0.7 : 0.55));
+    ctx.font = `${emojiSize}px 'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(t.type.emoji, 0, t.size * 0.42);
-    // value tag
-    ctx.font = `bold ${Math.max(11, Math.floor(t.size * 0.22))}px 'Bangers',cursive`;
-    ctx.fillStyle = '#2A1810';
-    ctx.fillText(`+${t.type.value}`, 0, -t.size * 0.42);
+    ctx.fillText(t.type.emoji, 0, emojiCenter);
+
+    // value/warning label
+    ctx.font = `bold ${Math.max(11, Math.floor(t.size * 0.24))}px 'Bangers',cursive`;
+    if (t.type.penalty) {
+      ctx.fillStyle = '#C8102E';
+      ctx.strokeStyle = '#FFF8E7';
+      ctx.lineWidth = 3;
+      ctx.strokeText('NO!', 0, -t.size * 0.42);
+      ctx.fillText('NO!', 0, -t.size * 0.42);
+    } else if (t.type.secret) {
+      ctx.font = `bold ${Math.floor(t.size * 0.42)}px 'Luckiest Guy',cursive`;
+      ctx.fillStyle = '#FFD700';
+      ctx.strokeStyle = '#5B2D8C';
+      ctx.lineWidth = 3;
+      ctx.strokeText('?', 0, -t.size * 0.5);
+      ctx.fillText('?', 0, -t.size * 0.5);
+    } else {
+      ctx.fillStyle = '#2A1810';
+      ctx.fillText(`+${t.type.value}`, 0, -t.size * 0.42);
+    }
     ctx.restore();
   }
 
@@ -1028,6 +1224,22 @@
       const r = 8 + k * 20;
       ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
       ctx.restore();
+    } else if (f.kind === 'bigText') {
+      ctx.save();
+      const popK = Math.min(1, k * 4);
+      const scale = popK * (1 - k * 0.15);
+      ctx.globalAlpha = 1 - k * 0.85;
+      ctx.translate(f.x, f.y);
+      ctx.scale(scale, scale);
+      ctx.font = `bold 48px 'Luckiest Guy', cursive`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.lineWidth = 8;
+      ctx.strokeStyle = '#2A1810';
+      ctx.fillStyle = f.color || '#FFC72C';
+      ctx.strokeText(f.text, 0, 0);
+      ctx.fillText(f.text, 0, 0);
+      ctx.restore();
     }
   }
 
@@ -1058,19 +1270,56 @@
       if (d <= t.size / 2 && d < hitDist) { hit = t; hitDist = d; }
     }
     if (hit) {
-      state.hits++;
       hit.alive = false;
       hit.hitFlash = 0.3;
+
+      // Penalty target — don't shoot this!
+      if (hit.type.penalty) {
+        const points = hit.type.value;
+        state.score += points;
+        hudScore.textContent = state.score.toLocaleString();
+        state.combo = 0;
+        Audio.buzz();
+        state.fx.push({ kind: 'splash', x: hit.x, y: hit.y, color: '#888', t: 0, dur: 0.5 });
+        state.fx.push({
+          kind: 'score', x: hit.x, y: hit.y - 10,
+          text: `${points}`, size: 28, color: '#444',
+          t: 0, dur: 1.0
+        });
+        state.fx.push({ kind: 'bigText', x: W / 2, y: H * 0.3, text: '撃つな！', color: '#C8102E', t: 0, dur: 1.1 });
+        return;
+      }
+
+      state.hits++;
+
+      // Secret bonus target — fanfare!
+      if (hit.type.secret) {
+        state.score += hit.type.value;
+        hudScore.textContent = state.score.toLocaleString();
+        Audio.fanfare();
+        state.fx.push({ kind: 'splash', x: hit.x, y: hit.y, color: '#FFD700', t: 0, dur: 0.7 });
+        state.fx.push({
+          kind: 'score', x: hit.x, y: hit.y - 20,
+          text: `★SECRET! +${hit.type.value}`, size: 32, color: '#FFD700',
+          t: 0, dur: 1.6
+        });
+        state.fx.push({ kind: 'bigText', x: W / 2, y: H * 0.3, text: '✨ SECRET! ✨', color: '#FFD700', t: 0, dur: 1.5 });
+        return;
+      }
+
       const isBullseye = hitDist <= hit.size / 6;
       const base = hit.type.value;
       const mult = isBullseye ? 5 : 1;
-      // combo
       state.combo++;
       state.comboTimer = 1.6;
       const comboBonus = state.combo >= 3 ? Math.min(state.combo, 8) : 1;
       const points = base * mult * comboBonus;
       state.score += points;
       hudScore.textContent = state.score.toLocaleString();
+
+      if (isBullseye) Audio.bullseye();
+      else Audio.ding(base);
+      if (state.combo >= 3) Audio.comboTick(state.combo);
 
       const color = isBullseye ? '#C8102E' : (mult > 1 ? '#5B2D8C' : '#FFC72C');
       state.fx.push({ kind: 'splash', x: hit.x, y: hit.y, color, t: 0, dur: 0.45 });
@@ -1090,6 +1339,7 @@
       }
     } else {
       state.combo = 0;
+      Audio.miss();
       state.fx.push({ kind: 'miss', x, y, t: 0, dur: 0.35 });
     }
   }
@@ -1124,6 +1374,10 @@
   }
 
   function startGame() {
+    Audio.init();
+    Audio.resume();
+    Audio.startBGM();
+    Audio.roundStart();
     state.running = true;
     state.roundIdx = 0;
     state.score = 0;
@@ -1140,6 +1394,8 @@
   function finishGame() {
     state.running = false;
     document.body.classList.remove('aiming');
+    Audio.stopBGM();
+    Audio.gameOverJingle();
     const score = state.score;
     document.getElementById('result-score').textContent = score.toLocaleString();
 
@@ -1192,16 +1448,35 @@
   stage.addEventListener('mousemove', moveAim);
   stage.addEventListener('touchmove', (e) => { moveAim(e); e.preventDefault(); }, { passive: false });
   stage.addEventListener('mousedown', (e) => {
-    if (e.target.closest('.btn,.return,.screen-card')) return;
+    if (e.target.closest('.btn,.return,.screen-card,#btn-mute')) return;
     moveAim(e);
     shoot(state.aimX, state.aimY);
   });
   stage.addEventListener('touchstart', (e) => {
-    if (e.target.closest('.btn,.return,.screen-card')) return;
+    if (e.target.closest('.btn,.return,.screen-card,#btn-mute')) return;
     moveAim(e);
     shoot(state.aimX, state.aimY);
     e.preventDefault();
   }, { passive: false });
+
+  // Mute toggle
+  const MUTE_KEY = 'toy-box-mania-muted-v1';
+  const muteBtn = document.getElementById('btn-mute');
+  let savedMuted = false;
+  try { savedMuted = localStorage.getItem(MUTE_KEY) === '1'; } catch (e) {}
+  if (savedMuted) muteBtn.textContent = '🔇';
+  muteBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    Audio.init();
+    Audio.resume();
+    const next = !Audio.isMuted();
+    Audio.setMute(next);
+    muteBtn.textContent = next ? '🔇' : '🔊';
+    try { localStorage.setItem(MUTE_KEY, next ? '1' : '0'); } catch (e) {}
+  });
+  // Apply persisted mute on first audio init
+  const _origInit = Audio.init;
+  Audio.init = function() { _origInit(); if (savedMuted) Audio.setMute(true); };
 
   document.getElementById('btn-start').addEventListener('click', startGame);
   document.getElementById('btn-retry').addEventListener('click', startGame);
