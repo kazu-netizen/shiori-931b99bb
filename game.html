@@ -10,6 +10,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Luckiest+Guy&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1240/gun.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1240/sea.min.js"></script>
 <style>
   :root {
     --woody-red: #C8102E;
@@ -317,6 +319,37 @@
     padding: 8px 0;
     letter-spacing: 1px;
   }
+  .leaderboard .lb-status {
+    text-align: center;
+    font-size: 11px;
+    color: var(--woody-brown);
+    margin-top: 6px;
+    letter-spacing: 1px;
+    opacity: 0.85;
+  }
+  .leaderboard .lb-status.offline { color: var(--woody-red); }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 80px;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(40, 40, 40, 0.92);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-family: 'Bangers', cursive;
+    font-size: 14px;
+    letter-spacing: 1px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    z-index: 200;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 
   /* ===== Name input ===== */
   .name-input-row {
@@ -562,6 +595,7 @@
       <div class="leaderboard">
         <h3>🏆 ハイスコアボード 🏆</h3>
         <ol id="title-leaderboard-list"></ol>
+        <div class="lb-status" id="title-lb-status"></div>
       </div>
       <div style="margin-top:14px;">
         <button class="btn" id="btn-start">START</button>
@@ -588,6 +622,7 @@
       <div class="leaderboard">
         <h3>🏆 ハイスコアボード 🏆</h3>
         <ol id="result-leaderboard-list"></ol>
+        <div class="lb-status" id="result-lb-status"></div>
       </div>
       <div style="margin-top:14px;">
         <button class="btn green" id="btn-retry">もう一度</button>
@@ -599,6 +634,7 @@
   <button id="btn-mute" type="button" aria-label="サウンド切り替え" title="サウンド ON/OFF">🔊</button>
 
   <a class="return" href="しおり.html">← しおりに戻る</a>
+  <div class="toast" id="toast"></div>
 </div>
 
 <script>
@@ -842,73 +878,232 @@
   };
 
   // ===== Leaderboard storage =====
+  // 家族で共通のハイスコアを共有するため、GUN.js の分散KVを使用。
+  // ハードコードした名前空間にみんなが書き込む → 全員に同期される。
   const LB_KEY = 'toy-box-mania-leaderboard-v1';
+  const SHARED_CACHE_KEY = 'toy-box-mania-shared-cache-v1';
+  const FAMILY_NS = 'pixar-tokyo-2026-toybox-mania-kazu-netizen-family-v1';
   const LB_DISPLAY = 5;
   const LB_MAX = 20;
-  function getLB() {
+
+  let sharedScores = new Map(); // name -> score (live from GUN)
+  let gun = null;
+  let gunBoard = null;
+  let gunOnline = false;
+
+  function getLocalLB() {
     try {
       const raw = localStorage.getItem(LB_KEY);
       const arr = raw ? JSON.parse(raw) : [];
       return Array.isArray(arr) ? arr : [];
     } catch (e) { return []; }
   }
+  function setLocalLB(arr) {
+    try { localStorage.setItem(LB_KEY, JSON.stringify(arr)); } catch (e) {}
+  }
+  function getSharedCache() {
+    try {
+      const raw = localStorage.getItem(SHARED_CACHE_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function setSharedCache(arr) {
+    try { localStorage.setItem(SHARED_CACHE_KEY, JSON.stringify(arr)); } catch (e) {}
+  }
+
+  function mergeScores(...lists) {
+    const map = new Map();
+    for (const list of lists) {
+      if (!Array.isArray(list)) continue;
+      for (const e of list) {
+        if (!e || typeof e.name !== 'string') continue;
+        const score = Number(e.score);
+        if (!Number.isFinite(score)) continue;
+        const cur = map.get(e.name);
+        if (!cur || score > cur.score) map.set(e.name, { name: e.name, score });
+      }
+    }
+    const merged = [...map.values()].sort((a, b) => b.score - a.score);
+    if (merged.length > LB_MAX) merged.length = LB_MAX;
+    return merged;
+  }
+
+  function sharedScoresAsArray() {
+    const arr = [];
+    for (const [name, score] of sharedScores) arr.push({ name, score });
+    return arr;
+  }
+
+  function getDisplayLB() {
+    return mergeScores(sharedScoresAsArray(), getLocalLB());
+  }
+
   function getHighest() {
-    const lb = getLB();
+    const lb = getDisplayLB();
     return lb.length ? lb[0].score : 0;
   }
-  function saveLB(name, score) {
-    const lb = getLB();
-    const existing = lb.find(e => e.name === name);
-    let isUpdated = false;
-    if (existing) {
-      if (score > existing.score) {
-        existing.score = score;
-        isUpdated = true;
-      }
-    } else {
-      lb.push({ name, score });
-      isUpdated = true;
-    }
-    lb.sort((a, b) => b.score - a.score);
-    if (lb.length > LB_MAX) lb.length = LB_MAX;
-    localStorage.setItem(LB_KEY, JSON.stringify(lb));
-    return isUpdated;
+
+  function saveLBLocal(name, score) {
+    const merged = mergeScores(getLocalLB(), [{ name, score }]);
+    setLocalLB(merged);
+    return merged;
   }
-  function renderLB(listEl, highlightName) {
-    const lb = getLB();
+
+  // ===== Shared (GUN.js) =====
+  function initSharedDB() {
+    if (typeof window.GUN !== 'function') {
+      console.warn('[shared] GUN library not loaded');
+      // Use cached snapshot for offline display
+      for (const e of getSharedCache()) {
+        if (e && typeof e.name === 'string' && Number.isFinite(Number(e.score))) {
+          sharedScores.set(e.name, Number(e.score));
+        }
+      }
+      return;
+    }
+    try {
+      gun = window.GUN({
+        peers: [
+          'https://gun-manhattan.herokuapp.com/gun',
+          'https://peer.wallie.io/gun',
+          'https://relay.peer.ooo/gun',
+          'https://gundb-relay-mlccl.ondigitalocean.app/gun',
+        ],
+      });
+      gunBoard = gun.get(FAMILY_NS).get('scoreboard-v1');
+    } catch (e) {
+      console.warn('[shared] GUN init failed', e);
+      return;
+    }
+
+    // Pre-populate from local cache so something shows immediately
+    for (const e of getSharedCache()) {
+      if (e && typeof e.name === 'string' && Number.isFinite(Number(e.score))) {
+        sharedScores.set(e.name, Number(e.score));
+      }
+    }
+
+    // Listen for live updates first, so initial sync from peers is captured
+    gunBoard.map().on((data, key) => {
+      try {
+        if (!data) return;
+        const name = typeof data.name === 'string' ? data.name : key;
+        const score = Number(data.score);
+        if (!name || !Number.isFinite(score)) return;
+        const cur = sharedScores.get(name);
+        if (cur === undefined || score > cur) {
+          sharedScores.set(name, score);
+          gunOnline = true;
+          persistSharedCache();
+          rerenderAll();
+        }
+      } catch (e) {
+        console.warn('[shared] map.on error', e);
+      }
+    });
+
+    // Delay initial push so peer sync completes first (avoids overwriting remote high scores
+    // with our local lower scores in case the local cache is stale).
+    setTimeout(() => {
+      for (const e of getLocalLB()) pushSharedScore(e.name, e.score);
+    }, 1500);
+  }
+
+  function persistSharedCache() {
+    setSharedCache(sharedScoresAsArray());
+  }
+
+  function pushSharedScore(name, score) {
+    if (!gunBoard || typeof name !== 'string' || !Number.isFinite(Number(score))) return;
+    const sc = Number(score);
+    // Keyed by name for natural per-player dedup. We compare against current
+    // value first so we never lower someone's high score.
+    try {
+      gunBoard.get(name).once((existing) => {
+        const cur = existing && Number(existing.score);
+        if (!Number.isFinite(cur) || sc > cur) {
+          gunBoard.get(name).put({ name, score: sc, ts: Date.now() });
+          gunOnline = true;
+        }
+      });
+    } catch (e) {
+      console.warn('[shared] push failed', e);
+    }
+  }
+
+  function rerenderAll() {
+    if (titleLBList) renderLB(titleLBList, null, titleLBStatus);
+    if (resultLBList && !resultScreen.classList.contains('hidden')) {
+      renderLB(resultLBList, null, resultLBStatus);
+    }
+  }
+
+  function renderLB(listEl, highlightName, statusEl) {
+    const lb = getDisplayLB();
     listEl.innerHTML = '';
     if (lb.length === 0) {
       const li = document.createElement('li');
       li.className = 'empty';
       li.textContent = 'まだスコアがありません — 一番乗りになろう！';
       listEl.appendChild(li);
-      return;
+    } else {
+      const medals = ['🥇', '🥈', '🥉'];
+      lb.slice(0, LB_DISPLAY).forEach((e, i) => {
+        const li = document.createElement('li');
+        if (highlightName && e.name === highlightName) li.classList.add('is-new');
+        const rankEl = document.createElement('span');
+        rankEl.className = 'rank-num';
+        rankEl.textContent = medals[i] || `${i + 1}`;
+        const nameEl = document.createElement('span');
+        nameEl.className = 'player-name';
+        nameEl.textContent = e.name;
+        const scoreEl = document.createElement('span');
+        scoreEl.className = 'player-score';
+        scoreEl.textContent = e.score.toLocaleString();
+        li.appendChild(rankEl);
+        li.appendChild(nameEl);
+        li.appendChild(scoreEl);
+        listEl.appendChild(li);
+      });
     }
-    const medals = ['🥇', '🥈', '🥉'];
-    lb.slice(0, LB_DISPLAY).forEach((e, i) => {
-      const li = document.createElement('li');
-      if (highlightName && e.name === highlightName) li.classList.add('is-new');
-      const rankEl = document.createElement('span');
-      rankEl.className = 'rank-num';
-      rankEl.textContent = medals[i] || `${i + 1}`;
-      const nameEl = document.createElement('span');
-      nameEl.className = 'player-name';
-      nameEl.textContent = e.name;
-      const scoreEl = document.createElement('span');
-      scoreEl.className = 'player-score';
-      scoreEl.textContent = e.score.toLocaleString();
-      li.appendChild(rankEl);
-      li.appendChild(nameEl);
-      li.appendChild(scoreEl);
-      listEl.appendChild(li);
-    });
+    if (statusEl) {
+      statusEl.classList.remove('offline');
+      if (gunOnline) {
+        statusEl.textContent = '👨‍👩‍👧 家族で共有中';
+      } else if (sharedScores.size > 0) {
+        statusEl.textContent = '⚠ オフライン（最後の同期データを表示）';
+        statusEl.classList.add('offline');
+      } else if (!gunBoard) {
+        statusEl.textContent = '⚠ 共有サーバに接続できませんでした';
+        statusEl.classList.add('offline');
+      } else {
+        statusEl.textContent = '🔄 家族のスコアを取得中...';
+      }
+    }
   }
+
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.remove('show');
+    void el.offsetWidth;
+    el.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => el.classList.remove('show'), 1800);
+  }
+
   const titleLBList = document.getElementById('title-leaderboard-list');
   const resultLBList = document.getElementById('result-leaderboard-list');
+  const titleLBStatus = document.getElementById('title-lb-status');
+  const resultLBStatus = document.getElementById('result-lb-status');
   const playerNameInput = document.getElementById('player-name');
   const savedMsg = document.getElementById('saved-msg');
   const nameSection = document.getElementById('name-section');
-  renderLB(titleLBList);
+
+  initSharedDB();
+  renderLB(titleLBList, null, titleLBStatus);
 
   // ===== Targets =====
   function spawnTarget() {
@@ -1403,7 +1598,7 @@
     nameSection.style.display = 'block';
     savedMsg.classList.remove('show');
     playerNameInput.value = '';
-    renderLB(resultLBList);
+    renderLB(resultLBList, null, resultLBStatus);
 
     // rank
     let rank = 'D', stars = '☆☆☆☆☆', sub = 'もう一度トライ！';
@@ -1483,7 +1678,7 @@
   document.getElementById('btn-title').addEventListener('click', () => {
     resultScreen.classList.add('hidden');
     titleScreen.classList.remove('hidden');
-    renderLB(titleLBList);
+    renderLB(titleLBList, null, titleLBStatus);
   });
 
   document.getElementById('btn-save').addEventListener('click', () => {
@@ -1494,13 +1689,14 @@
       setTimeout(() => { playerNameInput.style.borderColor = ''; }, 1200);
       return;
     }
-    saveLB(name, state.score);
+    saveLBLocal(name, state.score);
+    pushSharedScore(name, state.score);
     nameSection.style.display = 'none';
     savedMsg.classList.remove('show');
     void savedMsg.offsetWidth;
     savedMsg.classList.add('show');
-    renderLB(resultLBList, name);
-    renderLB(titleLBList);
+    renderLB(resultLBList, name, resultLBStatus);
+    renderLB(titleLBList, null, titleLBStatus);
   });
   playerNameInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
