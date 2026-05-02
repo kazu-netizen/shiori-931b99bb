@@ -10,8 +10,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Luckiest+Guy&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1240/gun.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1240/sea.min.js"></script>
 <style>
   :root {
     --woody-red: #C8102E;
@@ -878,18 +876,18 @@
   };
 
   // ===== Leaderboard storage =====
-  // 家族で共通のハイスコアを共有するため、GUN.js の分散KVを使用。
-  // ハードコードした名前空間にみんなが書き込む → 全員に同期される。
+  // 家族でハイスコアを共有するため、Cloudflare Workers + KV をAPIとして使用。
+  // 認証なし・自分のWorkerだけが書き込み先 → シンプルかつ安定。
   const LB_KEY = 'toy-box-mania-leaderboard-v1';
   const SHARED_CACHE_KEY = 'toy-box-mania-shared-cache-v1';
-  const FAMILY_NS = 'pixar-tokyo-2026-toybox-mania-kazu-netizen-family-v1';
+  const API_BASE = 'https://pixar-scoreboard.kazu-4e4.workers.dev';
+  const POLL_INTERVAL_MS = 10000;
   const LB_DISPLAY = 5;
   const LB_MAX = 20;
 
-  let sharedScores = new Map(); // name -> score (live from GUN)
-  let gun = null;
-  let gunBoard = null;
-  let gunOnline = false;
+  let sharedScores = new Map();
+  let cloudOnline = false;
+  let pollTimer = null;
 
   function getLocalLB() {
     try {
@@ -950,86 +948,79 @@
     return merged;
   }
 
-  // ===== Shared (GUN.js) =====
-  function initSharedDB() {
-    if (typeof window.GUN !== 'function') {
-      console.warn('[shared] GUN library not loaded');
-      // Use cached snapshot for offline display
-      for (const e of getSharedCache()) {
-        if (e && typeof e.name === 'string' && Number.isFinite(Number(e.score))) {
-          sharedScores.set(e.name, Number(e.score));
-        }
+  // ===== Cloud sync (Cloudflare Worker) =====
+  function applyCloudScores(arr) {
+    sharedScores.clear();
+    for (const e of arr) {
+      if (e && typeof e.name === 'string' && Number.isFinite(Number(e.score))) {
+        sharedScores.set(e.name, Number(e.score));
       }
-      return;
     }
-    try {
-      gun = window.GUN({
-        peers: [
-          'https://gun-manhattan.herokuapp.com/gun',
-          'https://peer.wallie.io/gun',
-          'https://relay.peer.ooo/gun',
-          'https://gundb-relay-mlccl.ondigitalocean.app/gun',
-        ],
-      });
-      gunBoard = gun.get(FAMILY_NS).get('scoreboard-v1');
-    } catch (e) {
-      console.warn('[shared] GUN init failed', e);
-      return;
-    }
+    setSharedCache(sharedScoresAsArray());
+  }
 
-    // Pre-populate from local cache so something shows immediately
+  async function fetchCloudScores() {
+    const res = await fetch(API_BASE + '/scores', { cache: 'no-store' });
+    if (!res.ok) throw new Error('fetch ' + res.status);
+    const arr = await res.json();
+    return Array.isArray(arr) ? arr : [];
+  }
+
+  async function pushCloudScore(name, score) {
+    const res = await fetch(API_BASE + '/scores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, score }),
+    });
+    if (!res.ok) throw new Error('push ' + res.status);
+    const data = await res.json();
+    return Array.isArray(data.scores) ? data.scores : [];
+  }
+
+  async function refreshCloud() {
+    try {
+      const arr = await fetchCloudScores();
+      applyCloudScores(arr);
+      cloudOnline = true;
+    } catch (e) {
+      cloudOnline = false;
+    }
+    rerenderAll();
+  }
+
+  function startPolling() {
+    if (pollTimer) return;
+    pollTimer = setInterval(refreshCloud, POLL_INTERVAL_MS);
+  }
+  function stopPolling() {
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  }
+
+  function initCloudSync() {
+    // Load cached snapshot for instant display
     for (const e of getSharedCache()) {
       if (e && typeof e.name === 'string' && Number.isFinite(Number(e.score))) {
         sharedScores.set(e.name, Number(e.score));
       }
     }
-
-    // Listen for live updates first, so initial sync from peers is captured
-    gunBoard.map().on((data, key) => {
-      try {
-        if (!data) return;
-        const name = typeof data.name === 'string' ? data.name : key;
-        const score = Number(data.score);
-        if (!name || !Number.isFinite(score)) return;
-        const cur = sharedScores.get(name);
-        if (cur === undefined || score > cur) {
-          sharedScores.set(name, score);
-          gunOnline = true;
-          persistSharedCache();
-          rerenderAll();
+    refreshCloud().then(() => {
+      // After successful first fetch, push existing local scores once
+      (async () => {
+        for (const e of getLocalLB()) {
+          try { await pushCloudScore(e.name, e.score); } catch (_) {}
         }
-      } catch (e) {
-        console.warn('[shared] map.on error', e);
+        await refreshCloud();
+      })();
+    });
+    startPolling();
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        refreshCloud();
+        startPolling();
+      } else {
+        stopPolling();
       }
     });
-
-    // Delay initial push so peer sync completes first (avoids overwriting remote high scores
-    // with our local lower scores in case the local cache is stale).
-    setTimeout(() => {
-      for (const e of getLocalLB()) pushSharedScore(e.name, e.score);
-    }, 1500);
-  }
-
-  function persistSharedCache() {
-    setSharedCache(sharedScoresAsArray());
-  }
-
-  function pushSharedScore(name, score) {
-    if (!gunBoard || typeof name !== 'string' || !Number.isFinite(Number(score))) return;
-    const sc = Number(score);
-    // Keyed by name for natural per-player dedup. We compare against current
-    // value first so we never lower someone's high score.
-    try {
-      gunBoard.get(name).once((existing) => {
-        const cur = existing && Number(existing.score);
-        if (!Number.isFinite(cur) || sc > cur) {
-          gunBoard.get(name).put({ name, score: sc, ts: Date.now() });
-          gunOnline = true;
-        }
-      });
-    } catch (e) {
-      console.warn('[shared] push failed', e);
-    }
   }
 
   function rerenderAll() {
@@ -1069,13 +1060,10 @@
     }
     if (statusEl) {
       statusEl.classList.remove('offline');
-      if (gunOnline) {
+      if (cloudOnline) {
         statusEl.textContent = '👨‍👩‍👧 家族で共有中';
       } else if (sharedScores.size > 0) {
         statusEl.textContent = '⚠ オフライン（最後の同期データを表示）';
-        statusEl.classList.add('offline');
-      } else if (!gunBoard) {
-        statusEl.textContent = '⚠ 共有サーバに接続できませんでした';
         statusEl.classList.add('offline');
       } else {
         statusEl.textContent = '🔄 家族のスコアを取得中...';
@@ -1102,7 +1090,7 @@
   const savedMsg = document.getElementById('saved-msg');
   const nameSection = document.getElementById('name-section');
 
-  initSharedDB();
+  initCloudSync();
   renderLB(titleLBList, null, titleLBStatus);
 
   // ===== Targets =====
@@ -1690,13 +1678,18 @@
       return;
     }
     saveLBLocal(name, state.score);
-    pushSharedScore(name, state.score);
     nameSection.style.display = 'none';
     savedMsg.classList.remove('show');
     void savedMsg.offsetWidth;
     savedMsg.classList.add('show');
     renderLB(resultLBList, name, resultLBStatus);
     renderLB(titleLBList, null, titleLBStatus);
+    pushCloudScore(name, state.score).then((arr) => {
+      applyCloudScores(arr);
+      cloudOnline = true;
+      renderLB(resultLBList, name, resultLBStatus);
+      renderLB(titleLBList, null, titleLBStatus);
+    }).catch(() => {});
   });
   playerNameInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
