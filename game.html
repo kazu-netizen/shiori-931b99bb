@@ -738,12 +738,27 @@
     function roundStart() { [523, 659, 784].forEach((f, i) => tone(f, 0.16, 'triangle', 0.25, i * 0.07)); }
     function gameOverJingle() { [880, 698, 587, 440].forEach((f, i) => tone(f, 0.22, 'triangle', 0.25, i * 0.10)); }
 
-    // Cheerful 8-bit BGM, looping
-    function startBGM() {
-      if (!actx || bgmActive) return;
-      bgmActive = true; bgmStop = false;
-      const tempo = 132, beat = 60 / tempo;
-      // C major upbeat melody
+    // Cheerful 8-bit BGM with layered intensity
+    // level: 1=メロディ薄く, 2=ベース追加, 3=アルペジオ追加, 'bonus'=お祝い専用曲
+    let currentLevel = 0;
+    function startBGM(level = 1) {
+      if (!actx) return;
+      bgmStop = true;
+      bgmActive = false;
+      currentLevel = level;
+      // Allow audio nodes to fade naturally before starting next layer
+      setTimeout(() => {
+        if (currentLevel !== level) return; // superseded
+        bgmStop = false;
+        bgmActive = true;
+        if (level === 'bonus') runBonusLoop(level);
+        else runMainLoop(level);
+      }, 60);
+    }
+
+    function runMainLoop(level) {
+      const tempo = 120 + (level - 1) * 8; // 120 / 128 / 136 BPM
+      const beat = 60 / tempo;
       const melody = [
         [523, 0.5], [659, 0.5], [784, 0.5], [659, 0.5],
         [1047, 1.0], [880, 0.5], [784, 0.5],
@@ -760,37 +775,47 @@
         [147, 1], [196, 1], [165, 1], [196, 1],
         [175, 1], [196, 1], [220, 2],
       ];
+      // Level 3: arpeggio overlay (fast 16th notes outlining chord)
+      const arpeggioPattern = [523, 659, 784, 1047, 1319, 1047, 784, 659];
       const loopDur = melody.reduce((s, n) => s + n[1] * beat, 0);
+
+      function noteOn(t, f, dur, type, vol) {
+        const osc = actx.createOscillator();
+        const g = actx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(f, t);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(vol, t + 0.005);
+        g.gain.linearRampToValueAtTime(vol * 0.65, t + dur * 0.7);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.95);
+        osc.connect(g); g.connect(master);
+        osc.start(t); osc.stop(t + dur);
+      }
+
       function scheduleLoop(startT) {
-        if (bgmStop || !actx) { bgmActive = false; return; }
+        if (bgmStop || !actx || currentLevel !== level) { bgmActive = false; return; }
+        // Melody (always plays). Volume scales with level: 1=soft, 2=mid, 3=full
+        const melVol = level === 1 ? 0.035 : level === 2 ? 0.045 : 0.05;
         let t = startT;
         for (const [f, b] of melody) {
-          const dur = b * beat;
-          const osc = actx.createOscillator();
-          const g = actx.createGain();
-          osc.type = 'square';
-          osc.frequency.setValueAtTime(f, t);
-          g.gain.setValueAtTime(0, t);
-          g.gain.linearRampToValueAtTime(0.045, t + 0.005);
-          g.gain.linearRampToValueAtTime(0.03, t + dur * 0.7);
-          g.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.95);
-          osc.connect(g); g.connect(master);
-          osc.start(t); osc.stop(t + dur);
-          t += dur;
+          noteOn(t, f, b * beat, 'square', melVol);
+          t += b * beat;
         }
-        let tb = startT;
-        for (const [f, b] of bass) {
-          const dur = b * beat;
-          const osc = actx.createOscillator();
-          const g = actx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(f, tb);
-          g.gain.setValueAtTime(0, tb);
-          g.gain.linearRampToValueAtTime(0.06, tb + 0.01);
-          g.gain.exponentialRampToValueAtTime(0.001, tb + dur * 0.9);
-          osc.connect(g); g.connect(master);
-          osc.start(tb); osc.stop(tb + dur);
-          tb += dur;
+        // Bass (level 2+)
+        if (level >= 2) {
+          let tb = startT;
+          for (const [f, b] of bass) {
+            noteOn(tb, f, b * beat, 'triangle', 0.06);
+            tb += b * beat;
+          }
+        }
+        // Arpeggio (level 3 only)
+        if (level >= 3) {
+          const arpStep = beat / 4;
+          for (let i = 0; i < Math.floor(loopDur / arpStep); i++) {
+            const f = arpeggioPattern[i % arpeggioPattern.length];
+            noteOn(startT + i * arpStep, f * 2, arpStep * 0.9, 'sawtooth', 0.018);
+          }
         }
         const nextStart = startT + loopDur;
         const wait = (nextStart - actx.currentTime - 0.3) * 1000;
@@ -798,12 +823,58 @@
       }
       scheduleLoop(actx.currentTime + 0.05);
     }
-    function stopBGM() { bgmStop = true; bgmActive = false; }
+
+    function runBonusLoop(level) {
+      // 専用「お祝い」テーマ: 速いテンポ・明るいメジャー進行
+      const tempo = 160, beat = 60 / tempo;
+      const melody = [
+        [784, 0.25], [988, 0.25], [1175, 0.25], [1568, 0.25],
+        [1175, 0.5], [988, 0.25], [784, 0.25],
+        [880, 0.25], [1047, 0.25], [1319, 0.25], [1760, 0.25],
+        [1319, 0.5], [1047, 0.5],
+        [1568, 0.25], [1319, 0.25], [988, 0.25], [784, 0.25],
+        [659, 0.5], [988, 0.25], [1047, 0.25],
+        [1319, 1.0],
+      ];
+      const bass = [
+        [196, 0.5], [262, 0.5], [196, 0.5], [330, 0.5],
+        [220, 0.5], [294, 0.5], [220, 0.5], [349, 0.5],
+        [165, 0.5], [220, 0.5], [196, 0.5], [262, 0.5],
+        [294, 1.0],
+      ];
+      const loopDur = melody.reduce((s, n) => s + n[1] * beat, 0);
+
+      function noteOn(t, f, dur, type, vol) {
+        const osc = actx.createOscillator();
+        const g = actx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(f, t);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(vol, t + 0.005);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.9);
+        osc.connect(g); g.connect(master);
+        osc.start(t); osc.stop(t + dur);
+      }
+      function scheduleLoop(startT) {
+        if (bgmStop || !actx || currentLevel !== level) { bgmActive = false; return; }
+        let t = startT;
+        for (const [f, b] of melody) { noteOn(t, f, b * beat, 'square', 0.05); t += b * beat; }
+        let tb = startT;
+        for (const [f, b] of bass) { noteOn(tb, f, b * beat, 'triangle', 0.07); tb += b * beat; }
+        const nextStart = startT + loopDur;
+        const wait = (nextStart - actx.currentTime - 0.3) * 1000;
+        setTimeout(() => scheduleLoop(nextStart), Math.max(0, wait));
+      }
+      scheduleLoop(actx.currentTime + 0.05);
+    }
+
+    function stopBGM() { bgmStop = true; bgmActive = false; currentLevel = 0; }
+    function setBGMLevel(level) { startBGM(level); }
     function setMute(m) {
       muted = m;
       if (master) master.gain.setValueAtTime(muted ? 0 : 0.4, actx.currentTime);
     }
-    return { init, resume, ding, bullseye, fanfare, buzz, miss, comboTick, roundStart, gameOverJingle, startBGM, stopBGM, setMute, isMuted: () => muted };
+    return { init, resume, ding, bullseye, fanfare, buzz, miss, comboTick, roundStart, gameOverJingle, startBGM, stopBGM, setBGMLevel, setMute, isMuted: () => muted };
   })();
 
   // ===== Round configs =====
@@ -850,6 +921,23 @@
       ],
       pattern: 'popup',
       shooter: 'cork'
+    },
+    {
+      // ボーナスラウンド: ペナルティ0回でクリアした人だけ出現
+      num: 'B', name: "Andy's Room (BONUS)", tip: 'おもちゃ箱から逃すな！全部高得点・ペナルティなし！',
+      bg: 'andyroom', spawnEvery: 0.32, duration: 15,
+      types: [
+        { kind: 'b_pig',   color: '#F49AC1', size: 40, value: 300,  speed: 220, weight: 4, emoji: '🐷' },
+        { kind: 'b_alien', color: '#7CC576', size: 42, value: 500,  speed: 240, weight: 3, emoji: '👽' },
+        { kind: 'b_woody', color: '#C8102E', size: 44, value: 700,  speed: 200, weight: 3, emoji: '🤠' },
+        { kind: 'b_buzz',  color: '#1B7F3A', size: 42, value: 700,  speed: 250, weight: 3, emoji: '🚀' },
+        { kind: 'b_jessie',color: '#FFC72C', size: 42, value: 800,  speed: 230, weight: 3, emoji: '🤠' },
+        { kind: 'b_rex',   color: '#7CC576', size: 46, value: 600,  speed: 180, weight: 2, emoji: '🦖' },
+        { kind: 'b_star',  color: '#FFC72C', size: 36, value: 1500, speed: 290, weight: 1.5, emoji: '⭐' },
+      ],
+      pattern: 'walk',
+      shooter: 'cork',
+      bonus: true,
     }
   ];
 
@@ -877,7 +965,10 @@
     streak: 0,
     hits: 0,
     shots: 0,
+    penaltyHits: 0,
+    bonusUnlocked: false,
   };
+  const REGULAR_ROUND_COUNT = 3;
 
   // ===== Leaderboard storage =====
   // 家族でハイスコアを共有するため、Cloudflare Workers + KV をAPIとして使用。
@@ -1280,7 +1371,89 @@
       ctx.fillStyle = '#6B3410';
       ctx.fillRect(0, H * 0.78, W, 12);
       ctx.fillRect(0, H * 0.65, W, 8);
+    } else if (round.bg === 'andyroom') {
+      // アンディの部屋: 雲柄の壁紙＋床
+      const g = ctx.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, '#9BD9F5');
+      g.addColorStop(0.7, '#5BB4E8');
+      g.addColorStop(0.71, '#C49A6C');
+      g.addColorStop(1, '#8B5A2B');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      // 雲柄
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+      for (let i = 0; i < 14; i++) {
+        const cx = ((i * 191) % W);
+        const cy = ((i * 71) % (H * 0.65));
+        ctx.beginPath();
+        ctx.arc(cx, cy, 16, 0, Math.PI * 2);
+        ctx.arc(cx + 14, cy - 6, 12, 0, Math.PI * 2);
+        ctx.arc(cx + 24, cy + 4, 14, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // 床の木目
+      ctx.strokeStyle = 'rgba(70, 40, 16, 0.4)';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 6; i++) {
+        const y = H * 0.71 + i * (H * 0.29 / 6);
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+      }
+      // おもちゃ箱
+      ctx.fillStyle = 'rgba(200, 16, 46, 0.85)';
+      ctx.fillRect(W * 0.05, H * 0.78, 90, 60);
+      ctx.fillStyle = '#FFC72C';
+      ctx.font = 'bold 18px "Bangers", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('TOYS', W * 0.05 + 45, H * 0.78 + 38);
+      ctx.textAlign = 'left';
     }
+
+    // === Toy Story 背景キャラ（半透明シルエット） ===
+    drawBgCharacters(round);
+  }
+
+  // 背景にトイ・ストーリーキャラのシルエット（半透明絵文字）を描画
+  function drawBgCharacters(round) {
+    const t = performance.now() / 1000;
+    ctx.save();
+    if (round.bg === 'farm') {
+      // 農場: ハム・スリンキー・ブルズアイ
+      drawBgEmoji('🐷', W * 0.18, H * 0.78, 90, 0.18, Math.sin(t * 0.5) * 6);
+      drawBgEmoji('🐶', W * 0.78, H * 0.82, 80, 0.15, Math.cos(t * 0.4) * 5);
+      drawBgEmoji('🐎', W * 0.5, H * 0.85, 100, 0.12, Math.sin(t * 0.3) * 8);
+    } else if (round.bg === 'space') {
+      // スペース: バズ・リトル・グリーンメン
+      drawBgEmoji('🚀', W * 0.15, H * 0.32, 110, 0.22, Math.sin(t * 0.3) * 14);
+      drawBgEmoji('👽', W * 0.45, H * 0.7, 50, 0.25, Math.sin(t * 1.2) * 6);
+      drawBgEmoji('👽', W * 0.55, H * 0.78, 50, 0.25, Math.cos(t * 1.0) * 6);
+      drawBgEmoji('👽', W * 0.65, H * 0.72, 50, 0.25, Math.sin(t * 0.9) * 6);
+    } else if (round.bg === 'west') {
+      // 西部: ウッディ・ジェシー・サボテン
+      drawBgEmoji('🤠', W * 0.12, H * 0.68, 110, 0.2, 0);
+      drawBgEmoji('🤠', W * 0.85, H * 0.7, 100, 0.18, 0);
+      drawBgEmoji('🌵', W * 0.35, H * 0.7, 70, 0.4, 0);
+      drawBgEmoji('🌵', W * 0.65, H * 0.68, 60, 0.4, 0);
+    } else if (round.bg === 'andyroom') {
+      // アンディの部屋: バズ・ウッディ・ジェシー・レックスがにぎやか
+      drawBgEmoji('🤠', W * 0.18, H * 0.5, 90, 0.6, Math.sin(t * 0.6) * 10);
+      drawBgEmoji('🚀', W * 0.82, H * 0.45, 90, 0.6, Math.cos(t * 0.7) * 12);
+      drawBgEmoji('🦖', W * 0.5, H * 0.58, 100, 0.6, Math.sin(t * 0.5) * 8);
+      drawBgEmoji('🐷', W * 0.35, H * 0.85, 60, 0.7, 0);
+      drawBgEmoji('👽', W * 0.65, H * 0.85, 60, 0.7, 0);
+    }
+    ctx.restore();
+  }
+
+  function drawBgEmoji(emoji, x, y, size, alpha, yOffset) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.font = `${size}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(emoji, x, y + yOffset);
+    ctx.restore();
   }
 
   function drawTarget(t) {
@@ -1466,6 +1639,7 @@
         state.score += points;
         hudScore.textContent = state.score.toLocaleString();
         state.combo = 0;
+        state.penaltyHits++;
         Audio.buzz();
         state.fx.push({ kind: 'splash', x: hit.x, y: hit.y, color: '#888', t: 0, dur: 0.5 });
         state.fx.push({
@@ -1547,23 +1721,46 @@
     state.spawnTimer = 0.4;
     state.targets = [];
     state.projectiles = [];
-    hudRound.textContent = `${round.num} / ${ROUNDS.length}`;
+    if (round.bonus) {
+      hudRound.textContent = '🎉 BONUS!';
+      Audio.setBGMLevel('bonus');
+    } else {
+      hudRound.textContent = `${round.num} / ${REGULAR_ROUND_COUNT}`;
+      Audio.setBGMLevel(state.roundIdx + 1);
+    }
+    Audio.roundStart();
     showBanner();
   }
 
   function advanceRound() {
     state.roundIdx++;
+    // 通常ラウンド完了 → ボーナスラウンドへの分岐判定
+    if (state.roundIdx === REGULAR_ROUND_COUNT) {
+      if (state.penaltyHits === 0) {
+        // ボーナスアンロック！
+        state.bonusUnlocked = true;
+        state.score += 5000;
+        hudScore.textContent = state.score.toLocaleString();
+        Audio.fanfare();
+        state.fx.push({ kind: 'bigText', x: W / 2, y: H * 0.3, text: '🎉 BONUS UNLOCK! 🎉', color: '#FFD700', t: 0, dur: 2.2 });
+        state.fx.push({ kind: 'bigText', x: W / 2, y: H * 0.42, text: '+5,000 ペナルティ0達成！', color: '#FFD700', t: 0, dur: 2.2 });
+        startRound();
+        return;
+      }
+      finishGame();
+      return;
+    }
     if (state.roundIdx >= ROUNDS.length) {
       finishGame();
-    } else {
-      startRound();
+      return;
     }
+    startRound();
   }
 
   function startGame() {
     Audio.init();
     Audio.resume();
-    Audio.startBGM();
+    Audio.setBGMLevel(1);
     Audio.roundStart();
     state.running = true;
     state.roundIdx = 0;
@@ -1571,6 +1768,8 @@
     state.combo = 0;
     state.hits = 0;
     state.shots = 0;
+    state.penaltyHits = 0;
+    state.bonusUnlocked = false;
     hudScore.textContent = '0';
     titleScreen.classList.add('hidden');
     resultScreen.classList.add('hidden');
