@@ -395,11 +395,15 @@
   }
 
   .rank {
-    font-family: 'Luckiest Guy', cursive;
-    font-size: 28px;
-    letter-spacing: 3px;
-    color: var(--buzz-green);
+    font-family: 'Bangers', 'Noto Sans JP', sans-serif;
+    font-weight: 900;
+    font-size: clamp(22px, 5.5vw, 30px);
+    letter-spacing: 2px;
+    color: var(--woody-red);
+    text-shadow: 2px 2px 0 var(--woody-yellow), 4px 4px 0 var(--woody-brown);
     margin-bottom: 4px;
+    line-height: 1.15;
+    word-break: keep-all;
   }
 
   /* ===== Round banner ===== */
@@ -1588,15 +1592,25 @@
     playerNameInput.value = '';
     renderLB(resultLBList, null, resultLBStatus);
 
-    // rank
-    let rank = 'D', stars = '☆☆☆☆☆', sub = 'もう一度トライ！';
-    if (score >= 8000) { rank = 'S'; stars = '★★★★★'; sub = '✨ ANDY ALL-STAR! ✨'; }
-    else if (score >= 5500) { rank = 'A'; stars = '★★★★☆'; sub = 'すごい！ 名スナイパー！'; }
-    else if (score >= 3500) { rank = 'B'; stars = '★★★☆☆'; sub = 'いい腕してるね、相棒！'; }
-    else if (score >= 2000) { rank = 'C'; stars = '★★☆☆☆'; sub = 'まだまだいける！'; }
-    document.getElementById('result-rank').textContent = `YOUR RANK: ${rank}`;
-    document.getElementById('result-stars').textContent = stars;
-    document.getElementById('result-subtitle').textContent = sub;
+    // rank — 10,000点ごとに区切るトイ・ストーリーランク（11段階）
+    const RANKS = [
+      { name: '押入れの奥',              stars: '☆☆☆☆☆', sub: '忘れられてるよ…もう一度！' },
+      { name: '床の上',                  stars: '★☆☆☆☆', sub: '遊んでもらえそう' },
+      { name: 'おもちゃ箱の住人',        stars: '★☆☆☆☆', sub: 'レギュラー候補' },
+      { name: 'お気に入り候補',          stars: '★★☆☆☆', sub: '抱っこされ始める' },
+      { name: 'レックス級',              stars: '★★☆☆☆', sub: '自信ないけど頑張る！' },
+      { name: 'ハム級',                  stars: '★★★☆☆', sub: '計算高くなった' },
+      { name: 'ジェシー級',              stars: '★★★☆☆', sub: 'ヤッホー！相棒！' },
+      { name: 'ウッディ級',              stars: '★★★★☆', sub: '保安官バッジ獲得' },
+      { name: 'バズ・ライトイヤー級',    stars: '★★★★☆', sub: 'スター・コマンド入隊' },
+      { name: 'アンディの相棒',          stars: '★★★★★', sub: '一番大事なおもちゃ' },
+      { name: 'TO INFINITY AND BEYOND!', stars: '🏆🏆🏆🏆🏆', sub: '無限の彼方へ！殿堂入り' },
+    ];
+    const rankIdx = Math.min(RANKS.length - 1, Math.max(0, Math.floor(score / 10000)));
+    const r = RANKS[rankIdx];
+    document.getElementById('result-rank').textContent = r.name;
+    document.getElementById('result-stars').textContent = r.stars;
+    document.getElementById('result-subtitle').textContent = r.sub;
 
     setTimeout(() => resultScreen.classList.remove('hidden'), 600);
   }
