@@ -114,13 +114,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     padding: 20px;
     z-index: 10;
     background: rgba(91, 180, 232, 0.92);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     text-align: center;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
   }
   .screen.hidden { display: none; }
 
@@ -133,6 +136,8 @@
     width: 100%;
     box-shadow: 0 10px 0 var(--woody-brown), 0 20px 40px var(--shadow);
     position: relative;
+    margin: auto 0;
+    flex-shrink: 0;
   }
   .screen-card::before, .screen-card::after {
     content: '';
@@ -1842,7 +1847,11 @@
     crosshair.style.top = p.y + 'px';
   }
   stage.addEventListener('mousemove', moveAim);
-  stage.addEventListener('touchmove', (e) => { moveAim(e); e.preventDefault(); }, { passive: false });
+  stage.addEventListener('touchmove', (e) => {
+    if (e.target.closest('.screen')) return;
+    moveAim(e);
+    e.preventDefault();
+  }, { passive: false });
   stage.addEventListener('mousedown', (e) => {
     if (e.target.closest('.btn,.return,.screen-card,#btn-mute')) return;
     moveAim(e);
