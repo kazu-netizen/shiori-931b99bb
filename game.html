@@ -683,7 +683,7 @@
 
   // ===== Audio engine (Web Audio API, no external files) =====
   const Audio = (() => {
-    let actx = null, master = null, muted = false, bgmActive = false, bgmStop = false;
+    let actx = null, master = null, bgmGain = null, muted = false, bgmActive = false, bgmStop = false;
     function init() {
       if (actx) return;
       try {
@@ -691,6 +691,9 @@
         master = actx.createGain();
         master.gain.value = muted ? 0 : 0.4;
         master.connect(actx.destination);
+        bgmGain = actx.createGain();
+        bgmGain.gain.value = 1;
+        bgmGain.connect(master);
       } catch (e) { /* audio unavailable */ }
     }
     function resume() {
@@ -797,7 +800,7 @@
         g.gain.linearRampToValueAtTime(vol, t + 0.005);
         g.gain.linearRampToValueAtTime(vol * 0.65, t + dur * 0.7);
         g.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.95);
-        osc.connect(g); g.connect(master);
+        osc.connect(g); g.connect(bgmGain);
         osc.start(t); osc.stop(t + dur);
       }
 
@@ -861,7 +864,7 @@
         g.gain.setValueAtTime(0, t);
         g.gain.linearRampToValueAtTime(vol, t + 0.005);
         g.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.9);
-        osc.connect(g); g.connect(master);
+        osc.connect(g); g.connect(bgmGain);
         osc.start(t); osc.stop(t + dur);
       }
       function scheduleLoop(startT) {
@@ -877,7 +880,17 @@
       scheduleLoop(actx.currentTime + 0.05);
     }
 
-    function stopBGM() { bgmStop = true; bgmActive = false; currentLevel = 0; }
+    function stopBGM() {
+      bgmStop = true;
+      bgmActive = false;
+      currentLevel = 0;
+      if (bgmGain && actx && master) {
+        try { bgmGain.disconnect(); } catch (e) {}
+        bgmGain = actx.createGain();
+        bgmGain.gain.value = 1;
+        bgmGain.connect(master);
+      }
+    }
     function setBGMLevel(level) { startBGM(level); }
     function setMute(m) {
       muted = m;
