@@ -500,8 +500,8 @@
   }
   .return:hover { background: rgba(42, 24, 16, 0.75); }
 
-  /* ===== Mute button ===== */
-  #btn-mute {
+  /* ===== Pause button ===== */
+  #btn-pause {
     position: absolute;
     bottom: 14px;
     right: 14px;
@@ -510,18 +510,20 @@
     border-radius: 50%;
     border: 3px solid var(--woody-brown);
     background: var(--paper);
-    font-size: 22px;
+    font-size: 20px;
+    color: var(--woody-brown);
     cursor: pointer;
     z-index: 7;
     box-shadow: 0 3px 0 var(--woody-brown), 0 6px 12px var(--shadow);
     line-height: 1;
     padding: 0;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     transition: transform 0.1s ease, box-shadow 0.1s ease;
   }
-  #btn-mute:active {
+  #btn-pause.show { display: flex; }
+  #btn-pause:active {
     transform: translateY(2px);
     box-shadow: 0 1px 0 var(--woody-brown), 0 3px 6px var(--shadow);
   }
@@ -640,9 +642,9 @@
     </div>
   </div>
 
-  <button id="btn-mute" type="button" aria-label="サウンド切り替え" title="サウンド ON/OFF">🔊</button>
+  <button id="btn-pause" type="button" aria-label="一時停止" title="一時停止 / 再開">⏸</button>
 
-  <button class="return" id="btn-restart" type="button">🔄 ゲームをリスタート</button>
+  <button class="return" id="btn-restart" type="button">リスタート</button>
   <div class="toast" id="toast"></div>
 </div>
 
@@ -958,6 +960,7 @@
   // ===== Game state =====
   const state = {
     running: false,
+    paused: false,
     roundIdx: 0,
     roundTimer: 0,
     spawnTimer: 0,
@@ -1622,7 +1625,7 @@
 
   // ===== Hit detection =====
   function shoot(x, y) {
-    if (!state.running) return;
+    if (!state.running || state.paused) return;
     state.shots++;
     const round = ROUNDS[state.roundIdx];
     const startX = W / 2, startY = H + 30;
@@ -1770,6 +1773,7 @@
     Audio.setBGMLevel(1);
     Audio.roundStart();
     state.running = true;
+    state.paused = false;
     state.roundIdx = 0;
     state.score = 0;
     state.combo = 0;
@@ -1781,12 +1785,16 @@
     titleScreen.classList.add('hidden');
     resultScreen.classList.add('hidden');
     document.body.classList.add('aiming');
+    pauseBtn.textContent = '⏸';
+    pauseBtn.classList.add('show');
     startRound();
   }
 
   function finishGame() {
     state.running = false;
+    state.paused = false;
     document.body.classList.remove('aiming');
+    pauseBtn.classList.remove('show');
     Audio.stopBGM();
     Audio.gameOverJingle();
     const score = state.score;
@@ -1825,7 +1833,7 @@
   function loop(now) {
     const dt = Math.min(0.05, (now - state.lastTime) / 1000 || 0);
     state.lastTime = now;
-    if (state.running) {
+    if (state.running && !state.paused) {
       update(dt);
       hudTime.textContent = Math.max(0, Math.ceil(state.roundTimer));
       if (state.roundTimer <= 5) hudTimeBlock.classList.add('warn');
@@ -1855,47 +1863,58 @@
     e.preventDefault();
   }, { passive: false });
   stage.addEventListener('mousedown', (e) => {
-    if (e.target.closest('.btn,.return,.screen-card,#btn-mute')) return;
+    if (e.target.closest('.btn,.return,.screen-card,#btn-pause')) return;
     moveAim(e);
     shoot(state.aimX, state.aimY);
   });
   stage.addEventListener('touchstart', (e) => {
-    if (e.target.closest('.btn,.return,.screen-card,#btn-mute')) return;
+    if (e.target.closest('.btn,.return,.screen-card,#btn-pause')) return;
     moveAim(e);
     shoot(state.aimX, state.aimY);
     e.preventDefault();
   }, { passive: false });
 
-  // Mute toggle
-  const MUTE_KEY = 'toy-box-mania-muted-v1';
-  const muteBtn = document.getElementById('btn-mute');
-  let savedMuted = false;
-  try { savedMuted = localStorage.getItem(MUTE_KEY) === '1'; } catch (e) {}
-  if (savedMuted) muteBtn.textContent = '🔇';
-  muteBtn.addEventListener('click', (e) => {
+  // Pause toggle
+  const pauseBtn = document.getElementById('btn-pause');
+  pauseBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    Audio.init();
-    Audio.resume();
-    const next = !Audio.isMuted();
-    Audio.setMute(next);
-    muteBtn.textContent = next ? '🔇' : '🔊';
-    try { localStorage.setItem(MUTE_KEY, next ? '1' : '0'); } catch (e) {}
+    if (!state.running) return;
+    state.paused = !state.paused;
+    if (state.paused) {
+      Audio.stopBGM();
+      pauseBtn.textContent = '▶';
+      pauseBtn.setAttribute('aria-label', '再開');
+    } else {
+      const round = ROUNDS[state.roundIdx];
+      if (round && round.bonus) Audio.setBGMLevel('bonus');
+      else Audio.setBGMLevel(state.roundIdx + 1);
+      pauseBtn.textContent = '⏸';
+      pauseBtn.setAttribute('aria-label', '一時停止');
+    }
   });
-  // Apply persisted mute on first audio init
-  const _origInit = Audio.init;
-  Audio.init = function() { _origInit(); if (savedMuted) Audio.setMute(true); };
+
+  function returnToTitle() {
+    state.running = false;
+    state.paused = false;
+    state.targets = [];
+    state.projectiles = [];
+    state.fx = [];
+    Audio.stopBGM();
+    document.body.classList.remove('aiming');
+    pauseBtn.classList.remove('show');
+    pauseBtn.textContent = '⏸';
+    resultScreen.classList.add('hidden');
+    titleScreen.classList.remove('hidden');
+    renderLB(titleLBList, null, titleLBStatus);
+  }
 
   document.getElementById('btn-start').addEventListener('click', startGame);
   document.getElementById('btn-retry').addEventListener('click', startGame);
   document.getElementById('btn-restart').addEventListener('click', (e) => {
     e.stopPropagation();
-    startGame();
+    returnToTitle();
   });
-  document.getElementById('btn-title').addEventListener('click', () => {
-    resultScreen.classList.add('hidden');
-    titleScreen.classList.remove('hidden');
-    renderLB(titleLBList, null, titleLBStatus);
-  });
+  document.getElementById('btn-title').addEventListener('click', returnToTitle);
 
   document.getElementById('btn-save').addEventListener('click', () => {
     const name = (playerNameInput.value || '').trim().slice(0, 8);
