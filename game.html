@@ -484,8 +484,7 @@
   /* ===== Footer link ===== */
   .return {
     position: absolute;
-    bottom: 12px; left: 50%;
-    transform: translateX(-50%);
+    bottom: 12px; left: 12px;
     z-index: 5;
     font-size: 12px;
     color: var(--paper);
@@ -495,6 +494,9 @@
     border-radius: 999px;
     letter-spacing: 1px;
     pointer-events: auto;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
   }
   .return:hover { background: rgba(42, 24, 16, 0.75); }
 
@@ -640,7 +642,7 @@
 
   <button id="btn-mute" type="button" aria-label="サウンド切り替え" title="サウンド ON/OFF">🔊</button>
 
-  <a class="return" href="しおり.html">← しおりに戻る</a>
+  <button class="return" id="btn-restart" type="button">🔄 ゲームをリスタート</button>
   <div class="toast" id="toast"></div>
 </div>
 
@@ -1885,6 +1887,10 @@
 
   document.getElementById('btn-start').addEventListener('click', startGame);
   document.getElementById('btn-retry').addEventListener('click', startGame);
+  document.getElementById('btn-restart').addEventListener('click', (e) => {
+    e.stopPropagation();
+    startGame();
+  });
   document.getElementById('btn-title').addEventListener('click', () => {
     resultScreen.classList.add('hidden');
     titleScreen.classList.remove('hidden');
